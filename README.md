@@ -6,6 +6,8 @@
 
 Run both the python backend and the react frontend.
 
+![image](https://github.com/GeoffreyFClark/CIS4301-Project/assets/97141856/8f3164b5-276e-4644-a34e-fc8448414628)
+
 ### Python Backend
 
 `cd python-backend`

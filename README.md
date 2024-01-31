@@ -1,6 +1,6 @@
 # CIS4301 Project
 
-`git clone https://github.com/GeoffreyFClark/CIS4301-Project/`
+`git clone https://github.com/GeoffreyFClark/Chess-Opening-Database-Project`
 
 ### General Notes
 

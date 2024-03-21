@@ -9,10 +9,10 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <CssBaseline /> 
+      {/* <ThemeProvider theme={theme}> */}
+        {/* <CssBaseline />  */}
         <App />
-      </ThemeProvider>
+      {/* </ThemeProvider> */}
     </BrowserRouter>
   </React.StrictMode>,
 );

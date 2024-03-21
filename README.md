@@ -1,8 +1,8 @@
 # CIS4301 Project
 
-![current project image](https://github.com/GeoffreyFClark/CIS4301-Project/assets/97141856/8f3164b5-276e-4644-a34e-fc8448414628)
-
 ![logo](https://github.com/GeoffreyFClark/Chess-Opening-Database-Project/blob/main/react-frontend/public/logo.png)
+
+![current project image](https://github.com/GeoffreyFClark/Chess-Opening-Database-Project/blob/main/react-frontend/public/screenshotMar20.png)
 
 This project uses React for the frontend and Flask for the backend.
 

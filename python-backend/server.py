@@ -9,13 +9,17 @@ CORS(app) # This is fine for development, but for production we need to restrict
 @app.route('/api/query-openings', methods=['POST'])
 def query_openings():
     data = request.json
-    moves = data['moves']
-    filters = data['filters']
+    print(data)
+    # moves = data['moves']
+    # filters = data['filters']
 
-    # Query Oracle database for moves based on previously input moves and filters
+    # Query Oracle database for resulting moves based on previously input moves and filters
 
     # followup_moves_in_database = query_database(moves, filters)
-    followup_moves_in_database = {}  
+
+    # Sample response
+    followup_moves_in_database = "e4 = 2534", "d4 = 1745", "Nf3 = 927"
+    
     return jsonify(followup_moves_in_database)
 
 

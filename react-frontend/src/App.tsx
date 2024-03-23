@@ -1,37 +1,29 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, Link } from 'react-router-dom';
+import './App.css';
+import QueryOpenings from './query_openings';
+import QueryResults from './query_results';
+import Navigation from './navigation';
+import Home from './home';
 
-function App() { 
 
-  interface Data {
-    members: string[];
-  }
-  
-  const [data, setData] = useState<Data | null>(null);
-
-  useEffect(() => {
-    fetch('http://localhost:5000/members').then(
-      res => res.json()
-    ).then(
-      data => {
-        setData(data)
-        console.log(data)
-      }
-    )
-  }, [])
+function App() {
 
   return (
     <div>
-      {data === null ? (
-        <p>Loading... Make sure server.py is running.</p>
-      ) : (
-        data.members.map((member, i) => (
-          <p key={i}>{member}</p>
-        ))
-      )}
-    </div>
-  );
-  
+      <nav>
+        <Navigation />
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/query-openings" element={<QueryOpenings />} />
+        <Route path="/query-results" element={<QueryResults />} />
+      </Routes>
 
+      
+    </div>
+
+  );
 }
 
 export default App

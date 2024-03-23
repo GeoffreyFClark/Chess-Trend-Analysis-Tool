@@ -1,0 +1,8 @@
+HW3 = 
+  (DESCRIPTION = 
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle.cise.ufl.edu)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = orcl)
+    )
+  )

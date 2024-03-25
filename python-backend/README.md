@@ -23,3 +23,5 @@
   Important: Name this system variable ORACLE_HOME.
 
   Windows: System->About->Advanced system settings->Environment Variables->Add New in System Variables
+
+NOTE that usage of OracleDB via a UF account requires an active Gatorlink VPN connection.

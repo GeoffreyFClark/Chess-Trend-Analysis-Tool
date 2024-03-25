@@ -17,6 +17,7 @@ function Navigation() {
         <Button color="inherit" component={Link} to="/">Home</Button>
         <Button color="inherit" component={Link} to="/query-openings">Query Openings</Button>
         <Button color="inherit" component={Link} to="/query-results">Results</Button>
+        <Button color="inherit" component={Link} to="/user-login">Login</Button>
       </Toolbar>
     </AppBar>
     <Box mt={4}> 

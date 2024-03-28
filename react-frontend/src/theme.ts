@@ -1,13 +1,9 @@
 import { createTheme } from '@mui/material/styles';
 
+// https://mui.com/material-ui/customization/theming/
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#556cd6',
-    },
-    secondary: {
-      main: '#19857b',
-    },
+    mode: 'light',
   },
 });
 

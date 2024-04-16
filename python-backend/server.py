@@ -4,6 +4,18 @@ from flask_cors import CORS
 import oracledb
 from config import OracleConfig
 import json
+from dotenv import load_dotenv
+import datetime
+
+load_dotenv()
+
+app = Flask(__name__)
+CORS(app) # This is fine for development, but for production we need to restrict to our frontend domain for security
+# CORS(app, resources={r"/api/*": {"origins": "http://OurFrontendDomain.com"}})
+
+# config database instance
+db = OracleConfig()
+
 
 # initializes the session with the database
 def init_session(connection):
@@ -19,41 +31,43 @@ def end_connection(connection, cursor):
     cursor.close()
     connection.close()
 
-# start_pool(): starts the connection pool to allow for multiple connections
-# NOTE: os.environ.get is for usage with .env file, implementation of which is recommended
-def start_pool(db):
 
-    pool_min = 4
-    pool_max = 4
-    pool_inc = 0
-    pool_gmd = oracledb.SPOOL_ATTRVAL_WAIT
+def convert_datetime(data):
+    """ Converts datetime objects to strings in a dictionary. """
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, datetime.datetime):
+                data[key] = value.strftime('%Y-%m-%d %H:%M:%S')
+    return data
 
-    dsn_tns = db.makedsn()
 
-    print("Connecting to", os.environ.get(dsn_tns))  
+def execute_query(query):
+    with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
+        with init_session(connection) as cursor:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            results = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
+            results = [convert_datetime(row) for row in results]
+            json_object = json.dumps(results, indent=4)
+            with open("sample.json", "w") as outfile:
+                outfile.write(json_object)
+            return results
 
-    pool = oracledb.create_pool(user=os.environ.get(db.username),
-                                password=os.environ.get(db.password),
-                                dsn=os.environ.get(dsn_tns),
-                                min=pool_min,
-                                max=pool_max,
-                                increment=pool_inc,
-                                threaded=True,
-                                getmode=pool_gmd,
-                                sessionCallback=init_session)
 
-    return pool
 
-app = Flask(__name__)
-CORS(app) # This is fine for development, but for production we need to restrict to our frontend domain for security
-# CORS(app, resources={r"/api/*": {"origins": "http://OurFrontendDomain.com"}})
+def test_execute_query():
+    with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM GAMES FETCH FIRST 100 ROWS ONLY")
+            rows = cursor.fetchall()
+            results = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
 
-# config database instance
-db = OracleConfig()
-db.init_oracle_client()
+            results = [convert_datetime(row) for row in results]
+            json_object = json.dumps(results, indent=4)
+            with open("sample.json", "w") as outfile:
+                outfile.write(json_object)
+            return results
 
-# Construct the Data Source Name (DSN) string for connecting to the Oracle database.
-dsn = db.makedsn()
 
 @app.route('/api/query-openings', methods=['POST'])
 def query_openings():
@@ -82,59 +96,25 @@ def query_results():
     results = {}  # Replace with actual database query result
     return jsonify(results)
 
-# login to database
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        db.username = request.form['username']
-        db.password = request.form['password']
-        return redirect(url_for('dashboard'))
-    return render_template('login.html')
 
-# hosts button to aiport view
-@app.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
-
-# currently functional
-def execute_query(username, password, dsn_tns):
-    # Connect to the Oracle database
-    connection = oracledb.connect(user=username, password=password, dsn=dsn_tns)
-    cursor = init_session(connection)  # Are we initializing the session with every query? Perhaps we can do this once under "config database instance" section
-    cursor.execute('SELECT * FROM AIRPORT')
-    rows = cursor.fetchall()
-
-    # # Writing to sample.json
-    # json_object = json.dumps(rows, indent=4)
-    # with open("sample.json", "w") as outfile:
-    #     outfile.write(json_object)
-
-    end_connection(connection, cursor)
-    return rows
+@app.route('/api/test-query', methods=['GET'])
+def api_test_query():
+    app.logger.info("Handling /api/test-query request")
+    try:
+        results = test_execute_query()
+        app.logger.info(f"Query returned {len(results)} results")
+        return jsonify(results), 200
+    except Exception as e:
+        app.logger.error(f"An error occurred: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
-# if query parameter is given string query, we could use this function for
-# every query we need. This could get hard to read and clunky though with long queries.
-def test_execute_query(username, password, dsn_tns, query):
-    # Connect to the Oracle database
-    connection = oracledb.connect(user=username, password=password, dsn=dsn_tns)
-    cursor = init_session(connection)
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    end_connection(connection, cursor)
-    return rows
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 
-
-# Route to display the results in the browser
-@app.route('/display_results')
-def display_results():
-    # Call the execute_query function to get the results
-    results = execute_query(db.username, db.password, dsn)
-
-    # Render a template with the results
-    return render_template('results.html', results=results)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-

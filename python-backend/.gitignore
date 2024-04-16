@@ -1,3 +1,4 @@
 venv
 __pycache__/
 instantclient_21_13/
+.env

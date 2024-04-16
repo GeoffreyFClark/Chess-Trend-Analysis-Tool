@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, render_template, request, redirect, url_for
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import oracledb
 from config import OracleConfig
@@ -41,19 +41,44 @@ def convert_datetime(data):
     return data
 
 
+# 5 Hard-Coded Complex Trend SQL Queries
+def sql_complex_trend_query_1():
+    return "SELECT * FROM games FETCH FIRST 2 ROWS ONLY"
+
+def sql_complex_trend_query_2():
+    return "SELECT * FROM games FETCH FIRST 4 ROWS ONLY"
+
+def sql_complex_trend_query_3():
+    return "SELECT * FROM games FETCH FIRST 6 ROWS ONLY"
+
+def sql_complex_trend_query_4():
+    return "SELECT * FROM games FETCH FIRST 8 ROWS ONLY"
+
+def sql_complex_trend_query_5():
+    return "SELECT * FROM games FETCH FIRST 10 ROWS ONLY"
+
+
+@app.route('/api/sql-complex-trend-query-<int:query_id>', methods=['GET'])
+def handle_complex_query(query_id):
+    query_function = globals().get(f'sql_complex_trend_query_{query_id}')
+    if query_function:
+        return execute_query(query_function())
+    return jsonify({'error': 'Invalid query id'}), 404
+
+
 def execute_query(query):
-    with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
-        with init_session(connection) as cursor:
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            results = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
-            results = [convert_datetime(row) for row in results]
-            json_object = json.dumps(results, indent=4)
-            with open("sample.json", "w") as outfile:
-                outfile.write(json_object)
-            return results
-
-
+    try:
+        with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
+            with init_session(connection) as cursor:
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                results = [convert_datetime(dict(zip([column[0] for column in cursor.description], row))) for row in rows]
+                json_object = json.dumps(results, indent=4)
+                with open("sample.json", "w") as outfile:
+                    outfile.write(json_object)
+                return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 def test_execute_query():
     with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:

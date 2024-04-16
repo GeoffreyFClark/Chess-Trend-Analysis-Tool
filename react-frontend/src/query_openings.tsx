@@ -2,28 +2,29 @@ import React, { useEffect, useState } from 'react';
 import {Chessboard} from "react-chessboard"; // react-chessboard component
 import {Chess} from "chess.js";  // chess.js library to provide logic to react-chessboard
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { useNavigate } from 'react-router-dom';
 
 
 // https://mui.com/x/api/data-grid/grid-col-def/
 // Definitions of columns for Material-UI data grid
-const columns: GridColDef[] = [
-  { field: 'Next Move', 
-    headerName: 'Next Move', 
-    width: 130,
-    sortable: false 
-  },
-  { field: 'Number of games', 
-    headerName: '# of Games',  
-    width: 130,
-    sortable: false 
-  },
-  { field: 'Winrate', 
-    headerName: 'Winrate', 
-    width: 260,
-    sortable: false,
-    // Display filled winrate percentage  renderCell: (params) => 
-  },
-];
+// const columns: GridColDef[] = [
+//   { field: 'Next Move', 
+//     headerName: 'Next Move', 
+//     width: 130,
+//     sortable: false 
+//   },
+//   { field: 'Number of games', 
+//     headerName: '# of Games',  
+//     width: 130,
+//     sortable: false 
+//   },
+//   { field: 'Winrate', 
+//     headerName: 'Winrate', 
+//     width: 260,
+//     sortable: false,
+//     // Display filled winrate percentage  renderCell: (params) => 
+//   },
+// ];
 
 
 export default function QueryOpenings() {
@@ -32,7 +33,27 @@ export default function QueryOpenings() {
   const [fen, setFen] = useState(game.fen());  // FEN represents a chessboard position, used to update react-chessboard
   // const [rows, setRows] = useState([]);  // To store and update data for the data grid
   // const [currentMoveIndex, setCurrentMoveIndex] = useState(0);  // To keep track of the current move index
+  
+  const navigate = useNavigate();
+  
+  const handleHardCodedQuery = async (queryNumber) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/sql-complex-trend-query-${queryNumber}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      navigate('/query-results', { state: { data } });
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
+  };
 
+  const hardCodedQueryDescriptions = [
+    "First 2 rows in our database",
+    "First 4 rows in our database",
+    "First 6 rows in our database",
+    "First 8 rows in our database",
+    "First 10 rows in our database",
+  ]
 
   // Sends the player's move to the server for processing
   const sendMoveToServer = async (sourceSq, targetSq, piece) => {
@@ -95,14 +116,14 @@ export default function QueryOpenings() {
 
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'start', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', gap: '24px' }}>
       <div style={{width: "40vw"}}>
         <Chessboard
             position={fen}
             onPieceDrop={onDrop}
         />
       </div>
-      <div style={{ height: 400, width: '50vw' }}>
+      {/* <div style={{ height: 400, width: '50vw' }}>
         <DataGrid
           // rows={}
           columns={columns} 
@@ -112,6 +133,16 @@ export default function QueryOpenings() {
           disableColumnResize
           hideFooter
         />
+      </div> */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        {hardCodedQueryDescriptions.map((desc, i) => (
+          <div key={i} style={{ margin: '3px' }}>
+            <button onClick={() => handleHardCodedQuery(i + 1)}>
+              SQL Complex Trend Query {i + 1}: {desc}
+            </button>
+
+          </div>
+        ))}
       </div>
     </div>
   );

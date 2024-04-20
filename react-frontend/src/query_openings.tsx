@@ -1,31 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import {Chessboard} from "react-chessboard"; // react-chessboard component
 import {Chess} from "chess.js";  // chess.js library to provide logic to react-chessboard
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
+import { Slider, Select, MenuItem, FormControl, TextField, Typography, Box, Autocomplete, createFilterOptions} from '@mui/material';
+import players from './players.json';
 
 
-// https://mui.com/x/api/data-grid/grid-col-def/
-// Definitions of columns for Material-UI data grid
-// const columns: GridColDef[] = [
-//   { field: 'Next Move', 
-//     headerName: 'Next Move', 
-//     width: 130,
-//     sortable: false 
-//   },
-//   { field: 'Number of games', 
-//     headerName: '# of Games',  
-//     width: 130,
-//     sortable: false 
-//   },
-//   { field: 'Winrate', 
-//     headerName: 'Winrate', 
-//     width: 260,
-//     sortable: false,
-//     // Display filled winrate percentage  renderCell: (params) => 
-//   },
-// ];
+const openings = {
+  "None": '',
+  "Queen's Gambit": 'd4 d5 c4',
+  "Sicilian Defense": 'e4 c5',
+  "French Defense": 'e4 e6 d4 d5',
+  "Ruy Lopez": 'e4 e5 Nf3 Nc6 Bb5',
+  "London System": 'd4 Nf6 Bf4',
+  "Italian Game": 'e4 e5 Nf3 Nc6 Bc4',
+};
 
+type Player = {
+  PLAYER: string;
+};
+
+const playersData = players as { PLAYER: string }[];
+
+const filterOptions = createFilterOptions({
+  limit: 6,
+});
 
 export default function QueryOpenings() {
   console.log("in app");
@@ -33,9 +32,17 @@ export default function QueryOpenings() {
   const [fen, setFen] = useState(game.fen());  // FEN represents a chessboard position, used to update react-chessboard
   // const [rows, setRows] = useState([]);  // To store and update data for the data grid
   // const [currentMoveIndex, setCurrentMoveIndex] = useState(0);  // To keep track of the current move index
-  
+  const [eloRange, setEloRange] = useState([100, 2900]);
+  const [numTurns, setNumTurns] = useState([1, 201]);
+  const [opening, setOpening] = useState('');
+  const [dataChoice, setDataChoice] = useState('');
+  const [graphBy, setGraphBy] = useState('year');
+  const [openingColor, setOpeningColor] = useState('White');
   const navigate = useNavigate();
-  
+  const [startDate, setStartDate] = useState(1800);
+  const [endDate, setEndDate] = useState(2024);
+  const [playerInputValue, setplayerInputValue] = useState('');
+
   const handleHardCodedQuery = async (queryNumber) => {
     try {
       const response = await fetch(`http://localhost:5000/api/sql-complex-trend-query-${queryNumber}`);
@@ -44,6 +51,22 @@ export default function QueryOpenings() {
       navigate('/query-results', { state: { data } });
     } catch (error) {
       console.error("Error fetching data:", error.message);
+    }
+  };
+
+  const handleAutocompleteChange = (event: any, value: Player) => {
+    if (value) console.log("Selected player: ", value.PLAYER);
+  };
+
+
+  const updateOpeningMoves = (selectedOpening) => {
+    if (selectedOpening && openings[selectedOpening]) {
+      game.reset();
+      openings[selectedOpening].split(' ').forEach(move => game.move(move));
+      setFen(game.fen());
+    } else {
+      game.reset();
+      setFen(game.fen());
     }
   };
 
@@ -116,33 +139,164 @@ export default function QueryOpenings() {
 
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', gap: '24px' }}>
-      <div style={{width: "40vw"}}>
+    <div style={{ display: 'flex', alignItems: 'start', gap: '24px' }}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', margin: '10px' }}>
         <Chessboard
             position={fen}
             onPieceDrop={onDrop}
         />
-      </div>
-      {/* <div style={{ height: 400, width: '50vw' }}>
-        <DataGrid
-          // rows={}
-          columns={columns} 
-          autoPageSize
-          disableRowSelectionOnClick
-          disableColumnMenu
-          disableColumnResize
-          hideFooter
-        />
-      </div> */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+      
         {hardCodedQueryDescriptions.map((desc, i) => (
-          <div key={i} style={{ margin: '3px' }}>
+          <div key={i} style={{ margin: '2px' }}>
             <button onClick={() => handleHardCodedQuery(i + 1)}>
               SQL Complex Trend Query {i + 1}: {desc}
             </button>
 
           </div>
         ))}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '500px' }}>
+        <Typography marginTop={'0px'}>
+          Preset Opening
+        </Typography>
+        <FormControl fullWidth sx={{height:'40px', backgroundColor: 'gray', border: '2px solid #ccc', borderRadius: '4px', marginBottom: '10px', marginTop: '0px'}}>
+          <Select sx={{height:'40px'}}
+            labelId="opening-label"
+            value={opening}
+            onChange={(e) => {
+              setOpening(e.target.value);
+              updateOpeningMoves(e.target.value);
+            }}
+          >
+            {Object.keys(openings).map((key) => (
+              <MenuItem key={key} value={key}>{key}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '10px' }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Start Year
+            </Typography>
+            <TextField
+              sx={{ height:'40px', backgroundColor: 'gray', border: '2px solid #ccc', borderRadius: '4px', width: '100%' }}
+              type="number"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="outlined"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              inputProps={{ min: 1800, max: 2024 }}
+            />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              End Year
+            </Typography>
+            <TextField
+              sx={{ height: '40px', backgroundColor: 'gray', border: '2px solid #ccc', borderRadius: '4px', width: '100%' }}
+              type="number"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="outlined"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              inputProps={{ min: 1800, max: 2024 }}
+            />
+          </Box>
+        </Box>
+
+
+        <Typography marginTop={'5px'}>
+          Elo Rating Range
+        </Typography>
+        <Slider 
+          value={eloRange}
+          onChange={(e, newValue) => setEloRange(newValue)}
+          valueLabelDisplay="auto"
+          min={100}
+          max={2900}
+          valueLabelFormat={(value) => value + " Elo Rating"}
+        />
+        <Typography marginTop={'5px'}>
+          Number of Turns
+        </Typography>
+        <Slider
+          value={numTurns}
+          onChange={(e, newValue) => setNumTurns(newValue)}
+          valueLabelDisplay="auto"
+          min={1}
+          max={201}
+          valueLabelFormat={(value) => value + " Moves"}
+        />
+
+        <Typography marginTop={'7px'}>Filter by a Player</Typography>
+        <Autocomplete 
+          sx={{ height: '40px', backgroundColor: 'gray', border: '2px solid #ccc', borderRadius: '4px', marginBottom: '12px', marginTop: '0px'}}
+          freeSolo
+          options={playerInputValue.length > 0 ? playersData : []}
+          getOptionLabel={(option) => option.PLAYER || ''}
+          filterOptions={filterOptions}
+          onInputChange={(event, newInputValue) => {
+            setplayerInputValue(newInputValue);
+          }}
+          renderInput={(params) => <TextField {...params} />}
+        />
+
+        <Typography marginTop={'0px'}>
+          Data
+        </Typography>
+        <FormControl fullWidth sx={{ height: '40px', backgroundColor: 'gray', border: '2px solid #ccc', borderRadius: '4px', marginBottom: '12px', marginTop: '0px'}}>
+          <Select sx={{height:'40px'}}
+            labelId="data-choice-label"
+            value={dataChoice}
+            label="Data"
+            onChange={(e) => setDataChoice(e.target.value)}
+          >
+            <MenuItem value="popularity">Popularity over time</MenuItem>
+            <MenuItem value="winrate">Winrate over time</MenuItem>
+          </Select>
+        </FormControl>
+        {dataChoice === 'winrate' && (
+          <div>
+          <Typography marginTop={'0px'}>
+            Opening Color
+          </Typography>
+          <FormControl fullWidth sx={{ backgroundColor: 'gray', border: '2px solid #ccc', borderRadius: '4px', marginBottom: '12px', marginTop: '0px'}}>
+            <Select
+              labelId="opening-color-label"
+              value={openingColor}
+              onChange={(e) => setOpeningColor(e.target.value)}
+            >
+              <MenuItem value="White">White</MenuItem>
+              <MenuItem value="Black">Black</MenuItem>
+            </Select>
+          </FormControl>
+          </div>
+        )}
+        <Typography marginTop={'0px'}>
+          Graph By
+        </Typography>
+        <FormControl fullWidth sx={{ height: '40px', backgroundColor: 'gray', border: '2px solid #ccc', borderRadius: '4px', marginBottom: '12px', marginTop: '0px'}}>
+          <Select sx={{height:'40px'}}
+            labelId="graph-by-label"
+            value={graphBy}
+            onChange={(e) => setGraphBy(e.target.value)}
+          >
+            <MenuItem value="month">Month</MenuItem>
+            <MenuItem value="quarter">Quarter</MenuItem>
+            <MenuItem value="year">Year</MenuItem>
+            <MenuItem value="2 years">2 Years</MenuItem>
+            <MenuItem value="5 years">5 Years</MenuItem>
+            <MenuItem value="decade">Decade</MenuItem>
+          </Select>
+        </FormControl>
+        
       </div>
     </div>
   );

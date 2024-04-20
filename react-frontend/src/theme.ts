@@ -5,6 +5,15 @@ const theme = createTheme({
   palette: {
     mode: 'light',
   },
+  components: {
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          height: '40px', 
+        },
+      },
+    },
+  },
 });
 
 export default theme;

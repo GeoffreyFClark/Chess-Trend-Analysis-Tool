@@ -20,12 +20,11 @@ def WinRates(minGames=1, fetchRows=130):
     return query
 
 
-# calculates average moves in loss of all ecocodes. Assumes that 4 is the average string length of one move.
-# can yield average moves in loss for just one eco code as well.
+# calculates average turns in loss of all ecocodes. Can yield average turns in loss for just one eco code as well.
 def AvgMovesInLoss(eco_code=None, fetchRows=130):
     where_clause = where_eco_code(eco_code)
     query = (f"SELECT ECOCODE, "
-             f"AVG(LENGTH(MOVES) / 4) AS AvgMovesInLoss "
+             f"AVG(TURNS) AS AvgMovesInLoss "
              f"FROM GAMES2 "
              f"{where_clause}"
              f"GROUP BY ECOCODE "

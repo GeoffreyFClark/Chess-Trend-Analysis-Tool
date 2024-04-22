@@ -6,6 +6,7 @@ from config import OracleConfig
 import json
 from dotenv import load_dotenv
 import datetime
+import queryhelper
 
 load_dotenv()
 
@@ -43,19 +44,19 @@ def convert_datetime(data):
 
 # 5 Hard-Coded Complex Trend SQL Queries
 def sql_complex_trend_query_1():
-    return "SELECT * FROM games FETCH FIRST 2 ROWS ONLY"
+    return "SELECT * FROM games2 FETCH FIRST 2 ROWS ONLY"
 
 def sql_complex_trend_query_2():
-    return "SELECT * FROM games FETCH FIRST 4 ROWS ONLY"
+    return queryhelper.query2()
 
 def sql_complex_trend_query_3():
-    return "SELECT * FROM games FETCH FIRST 6 ROWS ONLY"
+    return "SELECT * FROM games2 FETCH FIRST 6 ROWS ONLY"
 
 def sql_complex_trend_query_4():
-    return "SELECT * FROM games FETCH FIRST 8 ROWS ONLY"
+    return "SELECT * FROM games2 FETCH FIRST 8 ROWS ONLY"
 
 def sql_complex_trend_query_5():
-    return "SELECT * FROM games FETCH FIRST 10 ROWS ONLY"
+    return "SELECT * FROM games2 FETCH FIRST 10 ROWS ONLY"
 
 
 @app.route('/api/sql-complex-trend-query-<int:query_id>', methods=['GET'])
@@ -83,7 +84,7 @@ def execute_query(query):
 def test_execute_query():
     with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM GAMES FETCH FIRST 100 ROWS ONLY")
+            cursor.execute("SELECT * FROM GAMES2 FETCH FIRST 100 ROWS ONLY")
             rows = cursor.fetchall()
             results = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
 

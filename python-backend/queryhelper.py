@@ -32,16 +32,32 @@ def AvgMovesInLoss(eco_code=None, fetchRows=130):
              f"FETCH FIRST {fetchRows} ROWS ONLY")
     return query
 
+def TotalGamesInMonthYear():
+    query = (f"SELECT COUNT(*) AS Games, "
+             f"EXTRACT(MONTH FROM EVENTDATE) AS Month, "
+             f"EXTRACT(YEAR FROM EVENTDATE) AS Year "
+             f"FROM GAMES2 "
+             f"GROUP BY EXTRACT(MONTH FROM EVENTDATE), EXTRACT(YEAR FROM EVENTDATE)")
+    return query
+
 
 # query 2: Runs query 2 fully and allows various inputs
-def query2(min_Games=1, start_date="01-JAN-2018", end_date="31-DEC-2023", fetch_Rows=130):
+def query2(min_Games=1, start_date="JAN-2018", end_date="DEC-2023", fetch_Rows=130):
     query = (f"WITH WinRates AS ({WinRates(minGames=min_Games, fetchRows=fetch_Rows)}), "
-            f"AvgMovesInLoss AS ({AvgMovesInLoss(fetchRows=fetch_Rows)}) "
-            f"SELECT GAMES2.ECOCODE, GAMES2.EVENTDATE "
+            f"AvgMovesInLoss AS ({AvgMovesInLoss(fetchRows=fetch_Rows)}), "
+            f"GamesInMonthYear AS ({TotalGamesInMonthYear()}) "
+            f"SELECT ROUND((COUNT(*) * 100.0) / GamesInMonthYear.Games, 2) AS RiskyPlaysPercent, "
+                f"EXTRACT(MONTH FROM EVENTDATE) AS Month, "
+                f"EXTRACT(YEAR FROM EVENTDATE) AS Year "
             f"FROM WinRates "
             f"JOIN AvgMovesInLoss ON WinRates.ECOCODE = AvgMovesInLoss.ECOCODE "
             f"JOIN GAMES2 ON WinRates.ECOCODE = GAMES2.ECOCODE "
-            f"WHERE GAMES2.EVENTDATE <= TO_DATE('{end_date}', 'DD-MON-YYYY') "
-            f"AND GAMES2.EVENTDATE >= TO_DATE('{start_date}', 'DD-MON-YYYY')")
+            f"JOIN GamesInMonthYear ON EXTRACT(MONTH FROM GAMES2.EVENTDATE) = GamesInMonthYear.Month "
+                f"AND EXTRACT(YEAR FROM GAMES2.EVENTDATE) = GamesInMonthYear.Year "
+            f"WHERE GAMES2.EVENTDATE <= TO_DATE('{end_date}', 'MON-YYYY') "
+                f"AND GAMES2.EVENTDATE >= TO_DATE('{start_date}', 'MON-YYYY')"
+            f"GROUP BY EXTRACT(MONTH FROM GAMES2.EVENTDATE), EXTRACT(YEAR FROM GAMES2.EVENTDATE), GamesInMonthYear.Games "
+            f"ORDER BY Year, Month")
+    print(query)
     return query
 

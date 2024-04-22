@@ -2,18 +2,29 @@ import React, { useEffect, useState } from 'react';
 import {Chessboard} from "react-chessboard"; // react-chessboard component
 import {Chess} from "chess.js";  // chess.js library to provide logic to react-chessboard
 import { useNavigate } from 'react-router-dom';
-import { Slider, Select, MenuItem, FormControl, TextField, Typography, Box, Autocomplete, createFilterOptions} from '@mui/material';
+import { Slider, Select, MenuItem, FormControl, TextField, Typography, Box, Autocomplete, createFilterOptions, Button} from '@mui/material';
 import players from './players.json';
 
 
 const openings = {
   "None": '',
+  "King's Gambit": 'e4 e5 f4',
   "Queen's Gambit": 'd4 d5 c4',
   "Sicilian Defense": 'e4 c5',
   "French Defense": 'e4 e6 d4 d5',
-  "Ruy Lopez": 'e4 e5 Nf3 Nc6 Bb5',
+  "Caro-Kann Defense": 'e4 c6',
+  "Scandinavian Defense": 'e4 d5',
   "London System": 'd4 Nf6 Bf4',
+  "English Opening": 'c4',
+  "Spanish Game / Ruy Lopez": 'e4 e5 Nf3 Nc6 Bb5',
   "Italian Game": 'e4 e5 Nf3 Nc6 Bc4',
+  "Vienna Game": 'e4 e5 Nc3',
+  "Indian Game": 'd4 Nf6',
+  "King's Indian Defense": 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6',
+  "Nimzo-Indian Defense": 'd4 Nf6 c4 e6 Nc3 Bb4',
+  "Alekhine Defense": 'e4 Nf6',
+  "Pirc Defense": 'e4 d6 d4 Nf6 Nc3 g6',
+  "Modern Defense": 'e4 g6 d4 Bg7 Nc3 d6',
 };
 
 type Player = {
@@ -42,6 +53,10 @@ export default function QueryOpenings() {
   const [startDate, setStartDate] = useState(1800);
   const [endDate, setEndDate] = useState(2024);
   const [playerInputValue, setplayerInputValue] = useState('');
+  const [moveHistory, setMoveHistory] = useState<string[]>([]);
+
+
+  
 
   const handleHardCodedQuery = async (queryNumber) => {
     try {
@@ -60,12 +75,13 @@ export default function QueryOpenings() {
 
 
   const updateOpeningMoves = (selectedOpening) => {
+    game.reset();
     if (selectedOpening && openings[selectedOpening]) {
-      game.reset();
       openings[selectedOpening].split(' ').forEach(move => game.move(move));
+      setMoveHistory(openings[selectedOpening].split(' '));
       setFen(game.fen());
     } else {
-      game.reset();
+      setMoveHistory([]);
       setFen(game.fen());
     }
   };
@@ -77,6 +93,7 @@ export default function QueryOpenings() {
     "First 8 rows in our database",
     "First 10 rows in our database",
   ]
+
 
   // Sends the player's move to the server for processing
   const sendMoveToServer = async (sourceSq, targetSq, piece) => {
@@ -118,25 +135,51 @@ export default function QueryOpenings() {
 
     // Check if the move is legal using chess.js
     const legalMoves = game.moves({ square: sourceSq, verbose: true });
-    const isValidMove = legalMoves.some(legalMove => legalMove.to === targetSq);
-
-    if (!isValidMove) {
-      return false; // Exit if the move isn't legal
+    const move = legalMoves.find(legalMove => legalMove.to === targetSq);
+    if (!move) {
+      return false; 
     }
 
-    // Otherwise update chess.js game, FEN for react-chessboard, and send move to server
-    const result = game.move({ from: sourceSq, to: targetSq });
-    console.log("result before " + result.before + "after" + result.after + " in onDrop");
+    console.log(move);  // move = {color: 'w', piece: 'p', from: 'e2', to: 'e4', san: 'e4', …} use san notation for move history
 
+    game.move(move);
     setFen(game.fen());
-    console.log("Valid move in onDrop");
-
-    sendMoveToServer(sourceSq, targetSq, piece);
-    console.log("Move sent to server");
-
+    setMoveHistory(prev => [...prev, move.san]);
     return true;
   };
 
+
+
+  const submitSelections = async () => {
+    const payload = {
+      startDate,
+      endDate,
+      eloRange,
+      numTurns,
+      openingMoves: moveHistory.join(' '),
+      dataChoice,
+      graphBy,
+      player: playerInputValue,
+      openingColor
+    };
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/query-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      navigate('/query-results', { state: { data } });
+    } catch (error) {
+      console.error("Failed to submit query:", error);
+    }
+  };
+  
 
   return (
     <div style={{ display: 'flex', alignItems: 'start', gap: '24px' }}>
@@ -296,8 +339,15 @@ export default function QueryOpenings() {
             <MenuItem value="decade">Decade</MenuItem>
           </Select>
         </FormControl>
-        
+
+        <Button
+          variant="contained"
+          onClick={() => submitSelections()}
+        >
+          Submit
+        </Button>
       </div>
     </div>
+    
   );
 }

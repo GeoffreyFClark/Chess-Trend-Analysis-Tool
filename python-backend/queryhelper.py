@@ -11,10 +11,14 @@ def WinRates(minGames=1, fetchRows=130):
     query = (f"SELECT ECOCODE, "
                 f"SUM(CASE WHEN RESULT = '1-0' THEN 1 ELSE 0 END) AS Wins, "
                 f"SUM(CASE WHEN RESULT = '0-1' THEN 1 ELSE 0 END) AS Losses, "
-                f"ROUND(SUM(CASE WHEN RESULT = '1-0' THEN 1 ELSE 0 END) / (SUM(CASE WHEN RESULT = '0-1' THEN 1 ELSE 0 END) "
-                    f"+ SUM(CASE WHEN RESULT = '1-0' THEN 1 ELSE 0 END)), 2) AS WinRate "
+                f"SUM(CASE WHEN RESULT = '1/2-1/2' THEN 0.5 ELSE 0 END) AS DRAWS, "
+                f"(SUM(CASE WHEN RESULT = '1-0' THEN 1 ELSE 0 END) "
+                f"+ SUM(CASE WHEN RESULT = '1/2-1/2' THEN 0.5 ELSE 0 END)) "
+                f"/ (SUM(CASE WHEN RESULT = '0-1' THEN 1 ELSE 0 END) "
+                f"+ SUM(CASE WHEN RESULT = '1-0' THEN 1 ELSE 0 END) + "
+                f"(2 * SUM(CASE WHEN RESULT = '1/2-1/2' THEN 0.5 ELSE 0 END))) AS WinRate "
              f"FROM GAMES2 GROUP BY ECOCODE HAVING (SUM(CASE WHEN RESULT = '0-1' THEN 1 ELSE 0 END) "
-             f"+ SUM(CASE WHEN RESULT = '1-0' THEN 1 ELSE 0 END)) >= {minGames} "
+             f"+ SUM(CASE WHEN RESULT = '1-0' THEN 1 ELSE 0 END) + (2 * SUM(CASE WHEN RESULT = '1/2-1/2' THEN 0.5 ELSE 0 END))) >= {minGames} "
              f"ORDER BY WinRate DESC "
              f"FETCH FIRST {fetchRows} ROWS ONLY")
     return query
@@ -75,7 +79,7 @@ def query2(min_Games=1, start_date="JAN-2018", end_date="DEC-2023", fetch_Rows=1
     query = (f"WITH WinRates AS ({WinRates(minGames=min_Games, fetchRows=fetch_Rows)}), "
             f"AvgMovesInLoss AS ({AvgMovesInLoss(fetchRows=fetch_Rows)}), "
             f"GamesInMonthYear AS ({TotalGamesInMonthYear()}) "
-            f"SELECT ROUND((COUNT(*) * 100.0) / GamesInMonthYear.Games, 2) AS RiskyPlaysPercent, "
+            f"SELECT ROUND((COUNT(*) * 100.0) / GamesInMonthYear.Games, 2) AS POPULARITY, "
                 f"EXTRACT(MONTH FROM EVENTDATE) AS Month, "
                 f"EXTRACT(YEAR FROM EVENTDATE) AS Year "
             f"FROM WinRates "
@@ -95,10 +99,10 @@ def query3(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black
     query = (f"WITH UserSelectedGames AS ({UserSelectedGames(low_white_elo=low_white_elo, high_white_elo=high_white_elo, low_black_elo=low_black_elo, high_black_elo=high_black_elo, low_turn=low_turn, high_turn=high_turn, start_date=start_date, end_date=end_date)}), "
              f"DifferenceData AS ({DifferenceData()}), "
              f"YearTotals AS ({YearTotals()}) "
-             f"SELECT Year, ROUND((SampleYearProbability / ExpectedYearProbability), 3) AS SampleOverExpected "
+             f"SELECT YEAR, ROUND((SampleYearProbability / ExpectedYearProbability), 3) AS POPULARITY "
              f"FROM YearTotals "
              f"WHERE OccurrencesPerYear >= 250 "
-             f"ORDER BY Year DESC")
+             f"ORDER BY YEAR")
     print(query)
     return query
 

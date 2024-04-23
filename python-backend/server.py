@@ -7,6 +7,8 @@ import json
 from dotenv import load_dotenv
 import datetime
 import queryhelper
+from sql_gen_query import create_sql_query
+
 
 load_dotenv()
 
@@ -50,7 +52,7 @@ def sql_complex_trend_query_2():
     return queryhelper.query2()
 
 def sql_complex_trend_query_3():
-    return "SELECT * FROM games2 FETCH FIRST 6 ROWS ONLY"
+    return queryhelper.query3()
 
 def sql_complex_trend_query_4():
     return "SELECT * FROM games2 FETCH FIRST 8 ROWS ONLY"
@@ -70,16 +72,18 @@ def handle_complex_query(query_id):
 def execute_query(query):
     try:
         with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
-            with init_session(connection) as cursor:
-                cursor.execute(query)
-                rows = cursor.fetchall()
-                results = [convert_datetime(dict(zip([column[0] for column in cursor.description], row))) for row in rows]
-                json_object = json.dumps(results, indent=4)
-                with open("sample.json", "w") as outfile:
-                    outfile.write(json_object)
-                return jsonify(results)
+            cursor = connection.cursor()
+            app.logger.info(f"Executing SQL Query: {query}")
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            results = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
+            cursor.close()
+            return jsonify(results), 200
     except Exception as e:
+        app.logger.error(f"SQL Execution Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
 
 def test_execute_query():
     with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
@@ -114,13 +118,31 @@ def query_openings():
 
 @app.route('/api/query-results', methods=['POST'])
 def query_results():
-    data = request.json
-    opening_moves = data['openingMoves']
-    filters = data['filters']
-    # Query Oracle database for winrates over time based on selected opening moves and filters
-    # results = query_winrate_over_time(opening_moves, filters)
-    results = {}  # Replace with actual database query result
-    return jsonify(results)
+    data = request.get_json()
+    app.logger.info(f"Received POST data: {data}")
+    try:
+        sql_query = create_sql_query(
+            date_min=str(data['startDate']),
+            date_max=str(data['endDate']),
+            elo_min=int(data['eloRange'][0]),
+            elo_max=int(data['eloRange'][1]),
+            turns_min=int(data['numTurns'][0]),
+            turns_max=int(data['numTurns'][1]),
+            moves=data['openingMoves'],
+            data_metric=data['dataChoice'],
+            graph_by=str(data['graphBy']),
+            player=data.get('player', ''),
+            opening_color=(data['openingColor'].lower() == 'black')
+        )
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sql_query)
+        return execute_query(sql_query)
+    except KeyError as e:
+        app.logger.error(f"Key Error in request parameters: {str(e)}")
+        return jsonify({'error': 'Bad Request', 'message': f'Missing parameter: {str(e)}'}), 400
+    except ValueError as e:
+        app.logger.error(f"Value Error in request parameters: {str(e)}")
+        return jsonify({'error': 'Bad Request', 'message': f'Invalid parameter value: {str(e)}'}), 400
+
 
 
 @app.route('/api/test-query', methods=['GET'])

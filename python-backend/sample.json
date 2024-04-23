@@ -1,32 +1,214 @@
 [
     {
-        "GAMEID": 4122,
-        "TURNS": 40,
-        "EVENT": "Vladimir Dvorkovich Cup",
-        "SITE": "Taganrog RUS",
-        "EVENTDATE": "2019-01-12 00:00:00",
-        "ROUND": "3.11",
-        "WHITEPLAYER": "Tyurin,Artem",
-        "BLACKPLAYER": "Kotenko,P",
-        "RESULT": "0-1",
-        "WHITEELO": 1974,
-        "BLACKELO": 2394,
-        "ECOCODE": "E04",
-        "MOVES": "d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 Nc6 Qa4 Nd7 Qxc4 Nb6 Qd3 e5 Be3 Nb4 Qe4 Qd5 Qxd5 N6xd5 Na3 Nxe3 fxe3 e4 Nd2 f5 Kf2 h5 Nb5 Nd5 Nc4 Be6 Ne5 Bd6 Rac1 a6 Nxd6+ cxd6 Ng6 Rh6 Nf4 Kf7 Nxd5 Bxd5 b3 Rhh8 h4 Rhc8 Rhd1 a5 Ke1 Rxc1 Rxc1 a4 Rb1 axb3 axb3 Ra3 Kd2 Bxb3 Ke1 b5 Kf2 Bc4 Bh3 g6 Bf1 Ra2 g4 hxg4 Kg3 Ke6 Kf4 Kf6 Rc1  "
+        "YEAR": 2023,
+        "SAMPLEOVEREXPECTED": 0.779
     },
     {
-        "GAMEID": 4123,
-        "TURNS": 31,
-        "EVENT": "18th Prague Open 2019",
-        "SITE": "Prague CZE",
-        "EVENTDATE": "2019-01-14 00:00:00",
-        "ROUND": "5.6",
-        "WHITEPLAYER": "Lin,Yi",
-        "BLACKPLAYER": "Chkhaidze,Ni",
-        "RESULT": "1-0",
-        "WHITEELO": 2359,
-        "BLACKELO": 2290,
-        "ECOCODE": "E04",
-        "MOVES": "d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 c5 O-O Nc6 dxc5 Qxd1 Rxd1 Bxc5 Nbd2 c3 bxc3 O-O Nb3 Be7 c4 Bd7 Bb2 Rfd8 Nfd4 Rac8 Nb5 b6 Nd6 Bxd6 Rxd6 Be8 Rxd8 Rxd8 Rc1 Nb4 a3 Na6 c5 Ba4 cxb6 axb6 Bb7 Bxb3 Bxa6 Rd1+ Rxd1 Bxd1 Bd4 Nd7 Bb5 Nc5 Bxc5 bxc5 a4 Bc2 Bc6  "
+        "YEAR": 2022,
+        "SAMPLEOVEREXPECTED": 0.779
+    },
+    {
+        "YEAR": 2021,
+        "SAMPLEOVEREXPECTED": 0.787
+    },
+    {
+        "YEAR": 2020,
+        "SAMPLEOVEREXPECTED": 0.801
+    },
+    {
+        "YEAR": 2019,
+        "SAMPLEOVEREXPECTED": 0.735
+    },
+    {
+        "YEAR": 2018,
+        "SAMPLEOVEREXPECTED": 0.732
+    },
+    {
+        "YEAR": 2017,
+        "SAMPLEOVEREXPECTED": 0.748
+    },
+    {
+        "YEAR": 2016,
+        "SAMPLEOVEREXPECTED": 0.741
+    },
+    {
+        "YEAR": 2015,
+        "SAMPLEOVEREXPECTED": 0.749
+    },
+    {
+        "YEAR": 2014,
+        "SAMPLEOVEREXPECTED": 0.742
+    },
+    {
+        "YEAR": 2013,
+        "SAMPLEOVEREXPECTED": 0.738
+    },
+    {
+        "YEAR": 2012,
+        "SAMPLEOVEREXPECTED": 0.743
+    },
+    {
+        "YEAR": 2011,
+        "SAMPLEOVEREXPECTED": 0.74
+    },
+    {
+        "YEAR": 2010,
+        "SAMPLEOVEREXPECTED": 0.755
+    },
+    {
+        "YEAR": 2009,
+        "SAMPLEOVEREXPECTED": 0.748
+    },
+    {
+        "YEAR": 2008,
+        "SAMPLEOVEREXPECTED": 0.742
+    },
+    {
+        "YEAR": 2007,
+        "SAMPLEOVEREXPECTED": 0.743
+    },
+    {
+        "YEAR": 2006,
+        "SAMPLEOVEREXPECTED": 0.741
+    },
+    {
+        "YEAR": 2005,
+        "SAMPLEOVEREXPECTED": 0.736
+    },
+    {
+        "YEAR": 2004,
+        "SAMPLEOVEREXPECTED": 0.726
+    },
+    {
+        "YEAR": 2003,
+        "SAMPLEOVEREXPECTED": 0.717
+    },
+    {
+        "YEAR": 2002,
+        "SAMPLEOVEREXPECTED": 0.731
+    },
+    {
+        "YEAR": 2001,
+        "SAMPLEOVEREXPECTED": 0.718
+    },
+    {
+        "YEAR": 2000,
+        "SAMPLEOVEREXPECTED": 0.715
+    },
+    {
+        "YEAR": 1999,
+        "SAMPLEOVEREXPECTED": 0.727
+    },
+    {
+        "YEAR": 1998,
+        "SAMPLEOVEREXPECTED": 0.701
+    },
+    {
+        "YEAR": 1997,
+        "SAMPLEOVEREXPECTED": 0.728
+    },
+    {
+        "YEAR": 1996,
+        "SAMPLEOVEREXPECTED": 0.7
+    },
+    {
+        "YEAR": 1995,
+        "SAMPLEOVEREXPECTED": 0.7
+    },
+    {
+        "YEAR": 1994,
+        "SAMPLEOVEREXPECTED": 0.7
+    },
+    {
+        "YEAR": 1993,
+        "SAMPLEOVEREXPECTED": 0.717
+    },
+    {
+        "YEAR": 1992,
+        "SAMPLEOVEREXPECTED": 0.711
+    },
+    {
+        "YEAR": 1991,
+        "SAMPLEOVEREXPECTED": 0.682
+    },
+    {
+        "YEAR": 1990,
+        "SAMPLEOVEREXPECTED": 0.699
+    },
+    {
+        "YEAR": 1989,
+        "SAMPLEOVEREXPECTED": 0.667
+    },
+    {
+        "YEAR": 1988,
+        "SAMPLEOVEREXPECTED": 0.663
+    },
+    {
+        "YEAR": 1987,
+        "SAMPLEOVEREXPECTED": 0.641
+    },
+    {
+        "YEAR": 1986,
+        "SAMPLEOVEREXPECTED": 0.612
+    },
+    {
+        "YEAR": 1985,
+        "SAMPLEOVEREXPECTED": 0.557
+    },
+    {
+        "YEAR": 1984,
+        "SAMPLEOVEREXPECTED": 0.572
+    },
+    {
+        "YEAR": 1983,
+        "SAMPLEOVEREXPECTED": 0.591
+    },
+    {
+        "YEAR": 1982,
+        "SAMPLEOVEREXPECTED": 0.606
+    },
+    {
+        "YEAR": 1981,
+        "SAMPLEOVEREXPECTED": 0.584
+    },
+    {
+        "YEAR": 1980,
+        "SAMPLEOVEREXPECTED": 0.604
+    },
+    {
+        "YEAR": 1979,
+        "SAMPLEOVEREXPECTED": 0.584
+    },
+    {
+        "YEAR": 1978,
+        "SAMPLEOVEREXPECTED": 0.549
+    },
+    {
+        "YEAR": 1977,
+        "SAMPLEOVEREXPECTED": 0.54
+    },
+    {
+        "YEAR": 1976,
+        "SAMPLEOVEREXPECTED": 0.59
+    },
+    {
+        "YEAR": 1975,
+        "SAMPLEOVEREXPECTED": 0.574
+    },
+    {
+        "YEAR": 1974,
+        "SAMPLEOVEREXPECTED": 0.534
+    },
+    {
+        "YEAR": 1973,
+        "SAMPLEOVEREXPECTED": 0.546
+    },
+    {
+        "YEAR": 1972,
+        "SAMPLEOVEREXPECTED": 0.583
+    },
+    {
+        "YEAR": 1971,
+        "SAMPLEOVEREXPECTED": 0.538
     }
 ]

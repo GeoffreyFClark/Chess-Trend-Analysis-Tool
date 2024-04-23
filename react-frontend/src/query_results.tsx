@@ -15,13 +15,23 @@ const QueryResults = () => {
     </div>
   );
   }
+  if ("SAMPLEOVEREXPECTED" in data[0] ){
+    console.log("Query 3 Activated");
+    return(
+        <div>
+          <h1>Query Results</h1>
 
-  return (
-    <div>
-      <h1>Query Results</h1>
-      {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>No data available.</p>}
-    </div>
-  );
+        </div>
+    );
+  }
+  else {
+    return (
+        <div>
+          <h1>Query Results</h1>
+          {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>No data available.</p>}
+        </div>
+    );
+  }
 };
 
 export default QueryResults;

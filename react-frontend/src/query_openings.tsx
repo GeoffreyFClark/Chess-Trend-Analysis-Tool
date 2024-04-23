@@ -8,23 +8,23 @@ import players from './players.json';
 
 const openings = {
   "None": '',
-  "King's Gambit": 'e4 e5 f4',
-  "Queen's Gambit": 'd4 d5 c4',
-  "Sicilian Defense": 'e4 c5',
-  "French Defense": 'e4 e6 d4 d5',
-  "Caro-Kann Defense": 'e4 c6',
-  "Scandinavian Defense": 'e4 d5',
-  "London System": 'd4 Nf6 Bf4',
-  "English Opening": 'c4',
-  "Spanish Game / Ruy Lopez": 'e4 e5 Nf3 Nc6 Bb5',
-  "Italian Game": 'e4 e5 Nf3 Nc6 Bc4',
-  "Vienna Game": 'e4 e5 Nc3',
-  "Indian Game": 'd4 Nf6',
-  "King's Indian Defense": 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6',
-  "Nimzo-Indian Defense": 'd4 Nf6 c4 e6 Nc3 Bb4',
-  "Alekhine Defense": 'e4 Nf6',
-  "Pirc Defense": 'e4 d6 d4 Nf6 Nc3 g6',
-  "Modern Defense": 'e4 g6 d4 Bg7 Nc3 d6',
+  "King's Gambit": 'e4 e5 f4', //white opening 
+  "Queen's Gambit": 'd4 d5 c4', //white opening
+  "Sicilian Defense": 'e4 c5', //black opening
+  "French Defense": 'e4 e6 d4 d5', //black opening
+  "Caro-Kann Defense": 'e4 c6', //black opening
+  "Scandinavian Defense": 'e4 d5', //black opening
+  "London System": 'd4 Nf6 Bf4', //white opening
+  "English Opening": 'c4', //white opening
+  "Spanish Game / Ruy Lopez": 'e4 e5 Nf3 Nc6 Bb5', //white opening
+  "Italian Game": 'e4 e5 Nf3 Nc6 Bc4', //white opening
+  "Vienna Game": 'e4 e5 Nc3', //white opening
+  "Indian Game": 'd4 Nf6', //black opening
+  "King's Indian Defense": 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6', //black opening
+  "Nimzo-Indian Defense": 'd4 Nf6 c4 e6 Nc3 Bb4', //black opening
+  "Alekhine Defense": 'e4 Nf6', //black opening
+  "Pirc Defense": 'e4 d6 d4 Nf6 Nc3 g6', //black opening
+  "Modern Defense": 'e4 g6 d4 Bg7 Nc3 d6', //black opening
 };
 
 type Player = {
@@ -48,10 +48,10 @@ export default function QueryOpenings() {
   const [opening, setOpening] = useState('');
   const [dataChoice, setDataChoice] = useState('');
   const [graphBy, setGraphBy] = useState('year');
-  const [openingColor, setOpeningColor] = useState('White');
+  const [openingColor, setOpeningColor] = useState('False');
   const navigate = useNavigate();
-  const [startDate, setStartDate] = useState(1800);
-  const [endDate, setEndDate] = useState(2024);
+  const [startDate, setStartDate] = useState(1950);
+  const [endDate, setEndDate] = useState(2023);
   const [playerInputValue, setplayerInputValue] = useState('');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
 
@@ -151,17 +151,22 @@ export default function QueryOpenings() {
 
 
   const submitSelections = async () => {
+    const recognizedOpeningName = Object.keys(openings).find(key => openings[key] === moveHistory.join(' '));
     const payload = {
       startDate,
       endDate,
       eloRange,
       numTurns,
       openingMoves: moveHistory.join(' '),
+      openingName: recognizedOpeningName || "Opening", // Add the opening name if recognized
       dataChoice,
       graphBy,
       player: playerInputValue,
       openingColor
     };
+    console.log("Payload:", payload);
+    console.log("Opening Moves:", moveHistory.join(' '));
+    console.log("Opening Name:", recognizedOpeningName);
   
     try {
       const response = await fetch('http://localhost:5000/api/query-results', {
@@ -174,7 +179,7 @@ export default function QueryOpenings() {
   
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      navigate('/query-results', { state: { data } });
+      navigate('/query-results', { state: { data, openingMoves: moveHistory.join(' '), openingName: recognizedOpeningName, dataChoice } });
     } catch (error) {
       console.error("Failed to submit query:", error);
     }
@@ -233,7 +238,7 @@ export default function QueryOpenings() {
               variant="outlined"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              inputProps={{ min: 1800, max: 2024 }}
+              inputProps={{ min: 1850, max: 2022 }}
             />
           </Box>
           <Box sx={{ flex: 1 }}>
@@ -249,7 +254,7 @@ export default function QueryOpenings() {
               variant="outlined"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              inputProps={{ min: 1800, max: 2024 }}
+              inputProps={{ min: 1851, max: 2023 }}
             />
           </Box>
         </Box>
@@ -316,8 +321,8 @@ export default function QueryOpenings() {
               value={openingColor}
               onChange={(e) => setOpeningColor(e.target.value)}
             >
-              <MenuItem value="White">White</MenuItem>
-              <MenuItem value="Black">Black</MenuItem>
+              <MenuItem value="white">White</MenuItem>
+              <MenuItem value="black">Black</MenuItem>
             </Select>
           </FormControl>
           </div>

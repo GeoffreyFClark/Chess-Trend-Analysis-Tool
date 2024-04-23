@@ -132,9 +132,9 @@ def query_results():
             data_metric=data['dataChoice'],
             graph_by=str(data['graphBy']),
             player=data.get('player', ''),
-            black_opening=(data['openingColor'].lower() == 'black')
+            opening_color=(data['openingColor'].lower() == 'black')
         )
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", execute_query(sql_query))
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sql_query)
         return execute_query(sql_query)
     except KeyError as e:
         app.logger.error(f"Key Error in request parameters: {str(e)}")

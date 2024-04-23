@@ -55,7 +55,7 @@ def sql_complex_trend_query_3():
     return queryhelper.query3()
 
 def sql_complex_trend_query_4():
-    return "SELECT * FROM games2 FETCH FIRST 8 ROWS ONLY"
+    return queryhelper.query4()
 
 def sql_complex_trend_query_5():
     return "SELECT * FROM games2 FETCH FIRST 10 ROWS ONLY"

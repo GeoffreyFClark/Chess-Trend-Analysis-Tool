@@ -1,0 +1,214 @@
+[
+    {
+        "YEAR": 2023,
+        "SAMPLEOVEREXPECTED": 0.779
+    },
+    {
+        "YEAR": 2022,
+        "SAMPLEOVEREXPECTED": 0.779
+    },
+    {
+        "YEAR": 2021,
+        "SAMPLEOVEREXPECTED": 0.787
+    },
+    {
+        "YEAR": 2020,
+        "SAMPLEOVEREXPECTED": 0.801
+    },
+    {
+        "YEAR": 2019,
+        "SAMPLEOVEREXPECTED": 0.735
+    },
+    {
+        "YEAR": 2018,
+        "SAMPLEOVEREXPECTED": 0.732
+    },
+    {
+        "YEAR": 2017,
+        "SAMPLEOVEREXPECTED": 0.748
+    },
+    {
+        "YEAR": 2016,
+        "SAMPLEOVEREXPECTED": 0.741
+    },
+    {
+        "YEAR": 2015,
+        "SAMPLEOVEREXPECTED": 0.749
+    },
+    {
+        "YEAR": 2014,
+        "SAMPLEOVEREXPECTED": 0.742
+    },
+    {
+        "YEAR": 2013,
+        "SAMPLEOVEREXPECTED": 0.738
+    },
+    {
+        "YEAR": 2012,
+        "SAMPLEOVEREXPECTED": 0.743
+    },
+    {
+        "YEAR": 2011,
+        "SAMPLEOVEREXPECTED": 0.74
+    },
+    {
+        "YEAR": 2010,
+        "SAMPLEOVEREXPECTED": 0.755
+    },
+    {
+        "YEAR": 2009,
+        "SAMPLEOVEREXPECTED": 0.748
+    },
+    {
+        "YEAR": 2008,
+        "SAMPLEOVEREXPECTED": 0.742
+    },
+    {
+        "YEAR": 2007,
+        "SAMPLEOVEREXPECTED": 0.743
+    },
+    {
+        "YEAR": 2006,
+        "SAMPLEOVEREXPECTED": 0.741
+    },
+    {
+        "YEAR": 2005,
+        "SAMPLEOVEREXPECTED": 0.736
+    },
+    {
+        "YEAR": 2004,
+        "SAMPLEOVEREXPECTED": 0.726
+    },
+    {
+        "YEAR": 2003,
+        "SAMPLEOVEREXPECTED": 0.717
+    },
+    {
+        "YEAR": 2002,
+        "SAMPLEOVEREXPECTED": 0.731
+    },
+    {
+        "YEAR": 2001,
+        "SAMPLEOVEREXPECTED": 0.718
+    },
+    {
+        "YEAR": 2000,
+        "SAMPLEOVEREXPECTED": 0.715
+    },
+    {
+        "YEAR": 1999,
+        "SAMPLEOVEREXPECTED": 0.727
+    },
+    {
+        "YEAR": 1998,
+        "SAMPLEOVEREXPECTED": 0.701
+    },
+    {
+        "YEAR": 1997,
+        "SAMPLEOVEREXPECTED": 0.728
+    },
+    {
+        "YEAR": 1996,
+        "SAMPLEOVEREXPECTED": 0.7
+    },
+    {
+        "YEAR": 1995,
+        "SAMPLEOVEREXPECTED": 0.7
+    },
+    {
+        "YEAR": 1994,
+        "SAMPLEOVEREXPECTED": 0.7
+    },
+    {
+        "YEAR": 1993,
+        "SAMPLEOVEREXPECTED": 0.717
+    },
+    {
+        "YEAR": 1992,
+        "SAMPLEOVEREXPECTED": 0.711
+    },
+    {
+        "YEAR": 1991,
+        "SAMPLEOVEREXPECTED": 0.682
+    },
+    {
+        "YEAR": 1990,
+        "SAMPLEOVEREXPECTED": 0.699
+    },
+    {
+        "YEAR": 1989,
+        "SAMPLEOVEREXPECTED": 0.667
+    },
+    {
+        "YEAR": 1988,
+        "SAMPLEOVEREXPECTED": 0.663
+    },
+    {
+        "YEAR": 1987,
+        "SAMPLEOVEREXPECTED": 0.641
+    },
+    {
+        "YEAR": 1986,
+        "SAMPLEOVEREXPECTED": 0.612
+    },
+    {
+        "YEAR": 1985,
+        "SAMPLEOVEREXPECTED": 0.557
+    },
+    {
+        "YEAR": 1984,
+        "SAMPLEOVEREXPECTED": 0.572
+    },
+    {
+        "YEAR": 1983,
+        "SAMPLEOVEREXPECTED": 0.591
+    },
+    {
+        "YEAR": 1982,
+        "SAMPLEOVEREXPECTED": 0.606
+    },
+    {
+        "YEAR": 1981,
+        "SAMPLEOVEREXPECTED": 0.584
+    },
+    {
+        "YEAR": 1980,
+        "SAMPLEOVEREXPECTED": 0.604
+    },
+    {
+        "YEAR": 1979,
+        "SAMPLEOVEREXPECTED": 0.584
+    },
+    {
+        "YEAR": 1978,
+        "SAMPLEOVEREXPECTED": 0.549
+    },
+    {
+        "YEAR": 1977,
+        "SAMPLEOVEREXPECTED": 0.54
+    },
+    {
+        "YEAR": 1976,
+        "SAMPLEOVEREXPECTED": 0.59
+    },
+    {
+        "YEAR": 1975,
+        "SAMPLEOVEREXPECTED": 0.574
+    },
+    {
+        "YEAR": 1974,
+        "SAMPLEOVEREXPECTED": 0.534
+    },
+    {
+        "YEAR": 1973,
+        "SAMPLEOVEREXPECTED": 0.546
+    },
+    {
+        "YEAR": 1972,
+        "SAMPLEOVEREXPECTED": 0.583
+    },
+    {
+        "YEAR": 1971,
+        "SAMPLEOVEREXPECTED": 0.538
+    }
+]

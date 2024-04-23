@@ -46,16 +46,16 @@ def convert_datetime(data):
 
 # 5 Hard-Coded Complex Trend SQL Queries
 def sql_complex_trend_query_1():
-    return "SELECT * FROM games2 FETCH FIRST 2 ROWS ONLY"
+    return queryhelper.query1()
 
 def sql_complex_trend_query_2():
     return queryhelper.query2()
 
 def sql_complex_trend_query_3():
-    return "SELECT * FROM games2 FETCH FIRST 6 ROWS ONLY"
+    return queryhelper.query3()
 
 def sql_complex_trend_query_4():
-    return "SELECT * FROM games2 FETCH FIRST 8 ROWS ONLY"
+    return queryhelper.query4()
 
 def sql_complex_trend_query_5():
     return "SELECT * FROM games2 FETCH FIRST 10 ROWS ONLY"

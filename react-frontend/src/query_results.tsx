@@ -18,7 +18,7 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
   }));
 
   // Decide on the key for the XAxis based on graphBy
-  
+
   return (
     <div>
       <h2>{dataChoice === 'winrate' ? 'Winrate' : 'Popularity'} of {openingMoves}</h2>
@@ -26,11 +26,11 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={transformedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={'year'} />  
-            {/* 
+          <XAxis dataKey={'year'} />
+            {/*
             Fix key to get year+month. https://recharts.org/en-US/api/XAxis#type
             e.g. Try  { date: "20210103", category: "b", value: 1000 },
-            ].map(row => ({ ...row, ts: moment(row.date, "YYYYMMDD").valueOf() }));   
+            ].map(row => ({ ...row, ts: moment(row.date, "YYYYMMDD").valueOf() }));
             tickFormatter={(unixTimestamp) => moment(unixTimestamp).format("YYYY-MM")}
             */}
           <YAxis domain={['auto', 'auto']} tickFormatter={formatYAxisTick} />
@@ -50,7 +50,7 @@ const QueryResults = () => {
   const location = useLocation();
   const { data, openingMoves, openingName, dataChoice, graphBy } = location.state || { data: null, openingMoves: '', openingName: '', dataChoice: '', graphBy: 'year' };
   console.log("Query Results Data:")
-  console.log(data)
+  console.log(data, openingMoves)
 
   if (data && data.length > 0) {
     if ("RISKYPLAYSPERCENT" in data[0]) {
@@ -60,7 +60,16 @@ const QueryResults = () => {
         <h1>Query Results</h1>
         <Graph2 data={data} />
       </div>
-    );
+      );
+    }
+    if ("ELOGROUP" in data[0]) {
+      console.log("Query 2 Activated");
+      return (
+      <div>
+        <h1>Query Results</h1>
+        {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>No data available.</p>}
+      </div>
+      );
     }
     else {
       return (

@@ -1,0 +1,32 @@
+[
+    {
+        "GAMEID": 4122,
+        "TURNS": 40,
+        "EVENT": "Vladimir Dvorkovich Cup",
+        "SITE": "Taganrog RUS",
+        "EVENTDATE": "2019-01-12 00:00:00",
+        "ROUND": "3.11",
+        "WHITEPLAYER": "Tyurin,Artem",
+        "BLACKPLAYER": "Kotenko,P",
+        "RESULT": "0-1",
+        "WHITEELO": 1974,
+        "BLACKELO": 2394,
+        "ECOCODE": "E04",
+        "MOVES": "d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 Nc6 Qa4 Nd7 Qxc4 Nb6 Qd3 e5 Be3 Nb4 Qe4 Qd5 Qxd5 N6xd5 Na3 Nxe3 fxe3 e4 Nd2 f5 Kf2 h5 Nb5 Nd5 Nc4 Be6 Ne5 Bd6 Rac1 a6 Nxd6+ cxd6 Ng6 Rh6 Nf4 Kf7 Nxd5 Bxd5 b3 Rhh8 h4 Rhc8 Rhd1 a5 Ke1 Rxc1 Rxc1 a4 Rb1 axb3 axb3 Ra3 Kd2 Bxb3 Ke1 b5 Kf2 Bc4 Bh3 g6 Bf1 Ra2 g4 hxg4 Kg3 Ke6 Kf4 Kf6 Rc1  "
+    },
+    {
+        "GAMEID": 4123,
+        "TURNS": 31,
+        "EVENT": "18th Prague Open 2019",
+        "SITE": "Prague CZE",
+        "EVENTDATE": "2019-01-14 00:00:00",
+        "ROUND": "5.6",
+        "WHITEPLAYER": "Lin,Yi",
+        "BLACKPLAYER": "Chkhaidze,Ni",
+        "RESULT": "1-0",
+        "WHITEELO": 2359,
+        "BLACKELO": 2290,
+        "ECOCODE": "E04",
+        "MOVES": "d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 c5 O-O Nc6 dxc5 Qxd1 Rxd1 Bxc5 Nbd2 c3 bxc3 O-O Nb3 Be7 c4 Bd7 Bb2 Rfd8 Nfd4 Rac8 Nb5 b6 Nd6 Bxd6 Rxd6 Be8 Rxd8 Rxd8 Rc1 Nb4 a3 Na6 c5 Ba4 cxb6 axb6 Bb7 Bxb3 Bxa6 Rd1+ Rxd1 Bxd1 Bd4 Nd7 Bb5 Nc5 Bxc5 bxc5 a4 Bc2 Bc6  "
+    }
+]

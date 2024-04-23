@@ -5,6 +5,16 @@ def where_eco_code(eco_code):
         where_clause = f"WHERE ECOCODE = '{eco_code}' "
     return where_clause
 
+def query1(min_turns=1, max_turns=201, start_year="2000", end_year="2022"):
+    query = (f"SELECT (COUNT(CASE WHEN MOVES LIKE 'd4 d5 c4%' THEN 1 END) / COUNT(*)) * 100 AS Popularity, YearGroup AS Year "
+             f"FROM (SELECT FLOOR(EXTRACT(YEAR FROM EVENTDATE) / 2) * 2 as YearGroup, MOVES, EVENTDATE "
+             f"FROM GAMES2 "
+             f"WHERE EVENTDATE BETWEEN TO_DATE('{start_year}', 'YYYY') AND TO_DATE('{end_year}', 'YYYY') AND TURNS BETWEEN {min_turns} and {max_turns}) "
+             f"subquery "
+             f"GROUP BY YearGroup "
+             f"ORDER BY YearGroup")
+    return query
+
 
 # used in query 2: calculates win rates of all ecocodes.
 def WinRates(minGames=1, fetchRows=130):

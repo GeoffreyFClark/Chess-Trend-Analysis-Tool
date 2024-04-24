@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Graph2 from './Graphs';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label } from 'recharts';
 
 const formatYAxisTick = (tick) => {
   return tick.toFixed(2);
 };
 
-const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) => {
+const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy, YaxisLabel }) => {
+
 
   console.log("Query Results Data:")
   console.log(data, openingMoves)
@@ -31,6 +32,8 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
     winrate: parseFloat(entry.WINRATE),
     avgturns: parseFloat(entry.AVERAGENUMBEROFTURNS),
     elogroup: entry.ELOGROUP,
+    YaxisLabel: entry.YaxisLabel
+  }));
     ecocode: entry.ECOCODE,
     rank: entry.RANK
 }));
@@ -39,7 +42,8 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
 
   const elo_groups = [...new Set(transformedData.map(entry => entry.elogroup))];
   const eco_codes = [...new Set(transformedData.map(entry => entry.ecocode))];
-  // Decide on the key for the XAxis based on graphBy
+
+  
 
   return (
     <div>
@@ -49,7 +53,15 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
         <LineChart data={transformedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey={x_key} allowDuplicatedCategory={false} />
-          <YAxis domain={y_key} tickFormatter={formatYAxisTick} reversed={"RANK" in compare_data[0]}/>
+          <YAxis domain={y_key} tickFormatter={formatYAxisTick} reversed={"RANK" in compare_data[0]}>
+            <Label
+              value={YaxisLabel ? YaxisLabel : dataChoice === 'winrate' ? 'Winrate %' : (dataChoice === 'popularity' ? 'Popularity %' : 'Data')}
+              angle={-90}
+              position="insideLeft"
+              offset={-5}
+              style={{ textAnchor: 'middle' }}
+            />
+          </YAxis>
           <Tooltip />
           <Legend payload={[
             { value: dataChoice === 'winrate' ? 'Winrate' : (dataChoice === 'popularity' ? 'Popularity' : 'Proportion'), type: 'line', id: dataChoice, color: dataChoice === 'winrate' ? '#82ca9d' : '#8884d8' }

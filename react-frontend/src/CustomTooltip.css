@@ -1,0 +1,19 @@
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-box {
+  position: absolute;
+  width: 200px; /* Set the width of the tooltip */
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  color: white;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 6px;
+  z-index: 1000; /* Make sure it's on top of other elements */
+  opacity: 0.9;
+}

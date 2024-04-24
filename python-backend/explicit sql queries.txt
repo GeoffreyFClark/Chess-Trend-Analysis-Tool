@@ -54,3 +54,97 @@ Order BY Year DESC;
 
 
 Query 4:
+WITH UserSelectedGames AS (
+SELECT * 
+FROM GAMES2
+WHERE WHITEELO >= 246 AND WHITEELO <= 3958
+AND BLACKELO >= 246 AND BLACKELO <= 3958
+AND TURNS >= 1 AND TURNS <= 201
+AND EVENTDATE >= TO_DATE('01-JAN-1942', 'DD-MON-YYYY') AND EVENTDATE <= TO_DATE('01-JAN-2024', 'DD-MON-YYYY')
+),
+EvenlyMatchedGames AS (
+    SELECT
+        EXTRACT(YEAR FROM EVENTDATE) AS Year,
+        WHITEELO,
+        BLACKELO,
+        TURNS
+    FROM UserSelectedGames
+    WHERE WHITEELO - BLACKELO <= 50 AND WHITEELO - BLACKELO <= 50
+),
+EachYearsEloStatistics AS (
+    SELECT 
+        Year,
+        AVG((WHITEELO + BLACKELO) / 2) AS AveragePairElo,
+        STDDEV((WHITEELO + BLACKELO) / 2) AS StdDevPairElo
+    FROM 
+        EvenlyMatchedGames
+    GROUP BY Year
+)
+SELECT 
+    t1.Year,
+    CASE 
+        WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) < (t2.AveragePairElo - t2.StdDevPairElo) THEN 'BelowStdDevPair'
+        WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) > (t2.AveragePairElo + t2.StdDevPairElo) THEN 'AboveStdDevPair'
+        ELSE 'WithinStdDevPair'
+    END AS EloGroup,
+    AVG(t1.TURNS) AS AverageNumberOfTurns
+FROM 
+    EvenlyMatchedGames t1 JOIN EachYearsEloStatistics t2
+    ON t1.Year = t2.Year
+GROUP BY
+    t1.Year,
+    CASE 
+        WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) < (t2.AveragePairElo - t2.StdDevPairElo) THEN 'BelowStdDevPair'
+        WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) > (t2.AveragePairElo + t2.StdDevPairElo) THEN 'AboveStdDevPair'
+        ELSE 'WithinStdDevPair'
+    END;
+
+
+
+Query 5:
+WITH UserSelectedGames AS (
+    SELECT * 
+    FROM GAMES2
+    WHERE WHITEELO >= 246 AND WHITEELO <= 3958
+    AND BLACKELO >= 246 AND BLACKELO <= 3958
+    AND TURNS >= 1 AND TURNS <= 201
+    AND EVENTDATE >= TO_DATE('01-JAN-1942', 'DD-MON-YYYY') AND EVENTDATE <= TO_DATE('12-Dec-2023', 'DD-MON-YYYY')
+),
+PlayerAndECOByYear AS (
+    (SELECT
+        EXTRACT(YEAR FROM EVENTDATE) AS Year,
+        WHITEPLAYER AS Player,
+        ECOCODE
+    FROM
+        UserSelectedGames
+    )
+    UNION ALL
+    (SELECT
+        EXTRACT(YEAR FROM EVENTDATE) AS Year,
+        BLACKPLAYER AS Player,
+        ECOCODE
+    FROM
+        UserSelectedGames
+    )
+),
+ECORankByYear AS (
+    SELECT
+        Year,
+        ECOCODE,
+        RANK() OVER (PARTITION BY Year ORDER BY COUNT(*) DESC) AS Rank
+    FROM
+        PlayerAndECOByYear
+    GROUP BY
+        Year,
+        ECOCODE
+)
+SELECT
+    Year,
+    ECOCODE,
+    Rank
+FROM
+    ECORankByYear
+WHERE Rank <= 3
+ORDER BY 
+    Year ASC, 
+    Rank ASC;

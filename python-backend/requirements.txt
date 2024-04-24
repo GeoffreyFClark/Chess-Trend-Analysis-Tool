@@ -2,3 +2,7 @@ flask
 flask_cors
 oracledb
 python-dotenv
+Flask-SQLAlchemy
+werkzeug
+flask_jwt_extended
+pyzipcode

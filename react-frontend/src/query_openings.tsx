@@ -4,7 +4,7 @@ import {Chess} from "chess.js";  // chess.js library to provide logic to react-c
 import { useNavigate } from 'react-router-dom';
 import { Slider, Select, MenuItem, FormControl, TextField, Typography, Box, Autocomplete, createFilterOptions, Button} from '@mui/material';
 import players from './players.json';
-
+import CustomTooltip from './CustomTooltip';
 
 const openings = {
   "None": '',
@@ -55,7 +55,6 @@ export default function QueryOpenings() {
   const [playerInputValue, setplayerInputValue] = useState('');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
 
-
   
 
   const handleHardCodedQuery = async (queryNumber) => {
@@ -88,12 +87,13 @@ export default function QueryOpenings() {
   };
 
   const hardCodedQueryDescriptions = [
-    "First 2 rows in our database",
-    "First 4 rows in our database",
-    "First 6 rows in our database",
-    "First 8 rows in our database",
-    "First 10 rows in our database",
-  ]
+    { desc: "Specific Opening Prominence", tooltip: "" },
+    { desc: "Risky Openings", tooltip: "" },
+    { desc: "Result Predictions", tooltip: "" },
+    { desc: "Average Number of Turns", tooltip: "" },
+    { desc: "Popular Openings", tooltip: "Popular Openings: Analyze trends in the most popular chess openings over time. Chess openings are identified using Encyclopedia of Chess Openings (ECO) codes, the most common system for categorizing chess openings." }
+  ];
+  
 
 
   // Sends the player's move to the server for processing
@@ -153,6 +153,8 @@ export default function QueryOpenings() {
 
   const submitSelections = async () => {
     const recognizedOpeningName = Object.keys(openings).find(key => openings[key] === moveHistory.join(' '));
+    const YaxisLabel = dataChoice === 'winrate' ? 'Winrate %' :
+                     dataChoice === 'popularity' ? 'Popularity %' : 'Proportion %';
     const payload = {
       startDate,
       endDate,
@@ -163,7 +165,8 @@ export default function QueryOpenings() {
       dataChoice,
       graphBy,
       player: playerInputValue,
-      openingColor
+      openingColor,
+      YaxisLabel,
     };
     console.log("Payload:", payload);
     console.log("Opening Moves:", moveHistory.join(' '));
@@ -180,7 +183,7 @@ export default function QueryOpenings() {
   
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      navigate('/query-results', { state: { data, openingMoves: moveHistory.join(' '), openingName: recognizedOpeningName, dataChoice } });
+      navigate('/query-results', { state: { data, openingMoves: moveHistory.join(' '), openingName: recognizedOpeningName, dataChoice, YaxisLabel } });
     } catch (error) {
       console.error("Failed to submit query:", error);
     }
@@ -189,21 +192,25 @@ export default function QueryOpenings() {
 
   return (
     <div style={{ display: 'flex', alignItems: 'start', gap: '24px' }}>
-
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', margin: '10px' }}>
-        <Chessboard
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', margin: '10px', width: '35vw' }}>
+        <Chessboard 
             position={fen}
             onPieceDrop={onDrop}
         />
       
-        {hardCodedQueryDescriptions.map((desc, i) => (
-          <div key={i} style={{ margin: '2px' }}>
-            <button onClick={() => handleHardCodedQuery(i + 1)}>
-              SQL Complex Trend Query {i + 1}: {desc}
-            </button>
-
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'start', marginTop: '10px'}}>
+        {hardCodedQueryDescriptions.map((item, i) => (
+          <div key={i} style={{ margin: '2px', width: '35vw' }}> 
+            <CustomTooltip content={item.tooltip}>
+              <button onClick={() => handleHardCodedQuery(i + 1)} style={{ width: '35vw' }}> 
+                {item.desc}
+              </button>
+            </CustomTooltip>
           </div>
         ))}
+      </div>
+
+
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '500px' }}>

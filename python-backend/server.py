@@ -45,20 +45,20 @@ def convert_datetime(data):
 
 
 # 5 Hard-Coded Complex Trend SQL Queries
-def sql_complex_trend_query_1():
-    return queryhelper.query1()
+def sql_complex_trend_query_1(moves="d4 d5 c4", min_turns=1, max_turns=201, start_year="2000", end_year="2022", graph_by="year"):
+    return queryhelper.query1(moves, min_turns, max_turns, start_year, end_year, graph_by)
 
-def sql_complex_trend_query_2():
-    return queryhelper.query2()
+def sql_complex_trend_query_2(min_Games=1, start_date="JAN-2018", end_date="DEC-2023", fetch_Rows=130):
+    return queryhelper.query2(min_Games, start_date, end_date, fetch_Rows)
 
-def sql_complex_trend_query_3():
-    return queryhelper.query3()
+def sql_complex_trend_query_3(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "01-JAN-2024"):
+    return queryhelper.query3(low_white_elo, high_white_elo, low_black_elo, high_black_elo, low_turn, high_turn, start_date, end_date)
 
-def sql_complex_trend_query_4():
-    return queryhelper.query4()
+def sql_complex_trend_query_4(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "01-JAN-2024"):
+    return queryhelper.query4(low_white_elo, high_white_elo, low_black_elo, high_black_elo, low_turn, high_turn, start_date, end_date)
 
-def sql_complex_trend_query_5():
-    return "SELECT * FROM games2 FETCH FIRST 10 ROWS ONLY"
+def sql_complex_trend_query_5(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "01-JAN-2024"):
+    return queryhelper.query5(low_white_elo, high_white_elo, low_black_elo, high_black_elo, low_turn, high_turn, start_date, end_date)
 
 
 @app.route('/api/sql-complex-trend-query-<int:query_id>', methods=['GET'])

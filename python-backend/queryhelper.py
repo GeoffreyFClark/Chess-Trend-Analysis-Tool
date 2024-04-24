@@ -5,9 +5,23 @@ def where_eco_code(eco_code):
         where_clause = f"WHERE ECOCODE = '{eco_code}' "
     return where_clause
 
-def query1(min_turns=1, max_turns=201, start_year="2000", end_year="2022"):
-    query = (f"SELECT (COUNT(CASE WHEN MOVES LIKE 'd4 d5 c4%' THEN 1 END) / COUNT(*)) * 100 AS Popularity, YearGroup AS Year "
-             f"FROM (SELECT FLOOR(EXTRACT(YEAR FROM EVENTDATE) / 2) * 2 as YearGroup, MOVES, EVENTDATE "
+def query1(moves="d4 d5 c4", min_turns=1, max_turns=201, start_year="2000", end_year="2022", graph_by="year"):
+    intervals = {
+        'month': 1, 'quarter': 4, 'year': 1, '2 years': 2,
+        '5 years': 5, 'decade': 10
+    }
+    graph_by_multiplier = intervals.get(graph_by, 1)  # Default to 1 if graph_by is not defined in intervals
+    if graph_by=='month' or graph_by=='quarter':
+        query = (f"SELECT (COUNT(CASE WHEN MOVES LIKE '{moves}%' THEN 1 END) / COUNT(*)) * 100 AS Popularity, YearGroup AS Year "
+             f"FROM (SELECT EXTRACT(YEAR FROM EVENTDATE) as YearGroup, (EXTRACT(Month from EVENTDATE)/ {graph_by_multiplier}) * {graph_by_multiplier} as MonthGroup, MOVES, EVENTDATE "
+             f"FROM GAMES2 "
+             f"WHERE EVENTDATE BETWEEN TO_DATE('{start_year}', 'YYYY') AND TO_DATE('{end_year}', 'YYYY') AND TURNS BETWEEN {min_turns} and {max_turns}) "
+             f"subquery "
+             f"GROUP BY YearGroup "
+             f"ORDER BY YearGroup")
+    else:
+        query = (f"SELECT (COUNT(CASE WHEN MOVES LIKE '{moves}%' THEN 1 END) / COUNT(*)) * 100 AS Popularity, YearGroup AS Year "
+             f"FROM (SELECT FLOOR(EXTRACT(YEAR FROM EVENTDATE) / {graph_by_multiplier}) * {graph_by_multiplier} as YearGroup, MOVES, EVENTDATE "
              f"FROM GAMES2 "
              f"WHERE EVENTDATE BETWEEN TO_DATE('{start_year}', 'YYYY') AND TO_DATE('{end_year}', 'YYYY') AND TURNS BETWEEN {min_turns} and {max_turns}) "
              f"subquery "
@@ -63,7 +77,6 @@ def query2(min_Games=1, start_date="JAN-2018", end_date="DEC-2023", fetch_Rows=1
                 f"AND GAMES2.EVENTDATE >= TO_DATE('{start_date}', 'MON-YYYY') "
             f"GROUP BY EXTRACT(MONTH FROM GAMES2.EVENTDATE), EXTRACT(YEAR FROM GAMES2.EVENTDATE), GamesInMonthYear.Games "
             f"ORDER BY Year, Month")
-    print(query)
     return query
 
 # used in query 3
@@ -109,11 +122,10 @@ def query3(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black
     query = (f"WITH UserSelectedGames AS ({UserSelectedGames(low_white_elo=low_white_elo, high_white_elo=high_white_elo, low_black_elo=low_black_elo, high_black_elo=high_black_elo, low_turn=low_turn, high_turn=high_turn, start_date=start_date, end_date=end_date)}), "
              f"DifferenceData AS ({DifferenceData()}), "
              f"YearTotals AS ({YearTotals()}) "
-             f"SELECT YEAR, ROUND((SampleYearProbability / ExpectedYearProbability), 3) AS POPULARITY "
+             f"SELECT YEAR, ROUND((SampleYearProbability / ExpectedYearProbability), 3) AS PROPORTION "
              f"FROM YearTotals "
              f"WHERE OccurrencesPerYear >= 250 "
              f"ORDER BY YEAR")
-    print(query)
     return query
 
 def EvenlyMatchedGames():
@@ -144,6 +156,29 @@ def query4(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black
              f"ELSE 'WithinStdDevPair' "
              f"END "
              f"ORDER BY t1.Year")
-    print(query)
+    return query
+
+def PlayerAndEcoByYear():
+    query = (f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, WHITEPLAYER AS Player, ECOCODE "
+             f"FROM UserSelectedGames "
+             f"GROUP BY EXTRACT(YEAR FROM EVENTDATE), WHITEPLAYER, ECOCODE) "
+             f"UNION "
+             f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, BLACKPLAYER AS Player, ECOCODE "
+             f"FROM UserSelectedGames "
+             f"GROUP BY EXTRACT(YEAR FROM EVENTDATE), BLACKPLAYER, ECOCODE)")
+    return query
+
+def EcoRankByYear():
+    query = (f"SELECT Year, ECOCODE, RANK() OVER (PARTITION BY Year ORDER BY COUNT(*) DESC) AS Rank FROM PlayerAndECOByYear GROUP BY Year, ECOCODE")
+    return query
+
+def query5(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "01-JAN-2024"):
+    query = (f"WITH UserSelectedGames AS ({UserSelectedGames(low_white_elo=low_white_elo, high_white_elo=high_white_elo, low_black_elo=low_black_elo, high_black_elo=high_black_elo, low_turn=low_turn, high_turn=high_turn, start_date=start_date, end_date=end_date)}), "
+             f"PlayerAndEcoByYear AS ({PlayerAndEcoByYear()}), "
+             f"ECORankByYear AS ({EcoRankByYear()}) "
+             f"SELECT Year, ECOCODE, Rank "
+             f"FROM ECORankByYear "
+             f"WHERE RANK <= 3 "
+             f"ORDER BY YEAR ASC, RANK ASC ")
     return query
 

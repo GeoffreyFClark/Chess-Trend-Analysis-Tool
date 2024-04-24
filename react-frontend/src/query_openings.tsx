@@ -59,6 +59,7 @@ export default function QueryOpenings() {
   
 
   const handleHardCodedQuery = async (queryNumber) => {
+
     try {
       const response = await fetch(`http://localhost:5000/api/sql-complex-trend-query-${queryNumber}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

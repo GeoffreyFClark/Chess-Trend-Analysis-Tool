@@ -32,13 +32,13 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy, Ya
     winrate: parseFloat(entry.WINRATE),
     avgturns: parseFloat(entry.AVERAGENUMBEROFTURNS),
     elogroup: entry.ELOGROUP,
-    YaxisLabel: entry.YaxisLabel
-  }));
+    YaxisLabel: entry.YaxisLabel,
     ecocode: entry.ECOCODE,
-    rank: entry.RANK
-}));
+    rank: entry.RANK,
+  }));
+
   const x_key = compare_data[0].hasOwnProperty("MONTH") ? 'monthYear' : 'year';
-  const y_key = compare_data[0].hasOwnProperty("RANK") ? [1, 4] : ['auto', 'auto']
+  const y_key = compare_data[0].hasOwnProperty("RANK") ? [1, 4] : ['auto', 'auto'];
 
   const elo_groups = [...new Set(transformedData.map(entry => entry.elogroup))];
   const eco_codes = [...new Set(transformedData.map(entry => entry.ecocode))];

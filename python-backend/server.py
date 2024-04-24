@@ -45,8 +45,8 @@ def convert_datetime(data):
 
 
 # 5 Hard-Coded Complex Trend SQL Queries
-def sql_complex_trend_query_1(date="23-OCT-1980"):
-    return queryhelper.query1(date)
+def sql_complex_trend_query_1(moves="d4 d5 c4", min_turns=1, max_turns=201, start_year="2000", end_year="2022", graph_by="year"):
+    return queryhelper.query1(moves, min_turns, max_turns, start_year, end_year, graph_by)
 
 def sql_complex_trend_query_2(min_Games=1, start_date="JAN-2018", end_date="DEC-2023", fetch_Rows=130):
     return queryhelper.query2(min_Games, start_date, end_date, fetch_Rows)

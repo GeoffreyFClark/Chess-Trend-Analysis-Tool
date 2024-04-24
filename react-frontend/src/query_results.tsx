@@ -8,20 +8,28 @@ const formatYAxisTick = (tick) => {
 };
 
 const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) => {
+
+  console.log("Query Results Data:")
+  console.log(data, openingMoves)
   console.log("Data received for chart:", data);
+
 
   const transformedData = data.map((entry) => ({
     ...entry,
+    month: entry.month,
     year: entry.YEAR,  // Ensure you have proper key for year, month, or quarter
     popularity: parseFloat(entry.POPULARITY),
+    proportion: parseFloat(entry.PROPORTION),
     winrate: parseFloat(entry.WINRATE),
-  }));
-
+    avgturns: parseFloat(entry.AVERAGENUMBEROFTURNS),
+    elogroup: entry.ELOGROUP
+}));
+  const elo_groups = [...new Set(transformedData.map(entry => entry.ELOGROUP))];
   // Decide on the key for the XAxis based on graphBy
 
   return (
     <div>
-      <h2>{dataChoice === 'winrate' ? 'Winrate' : 'Popularity'} of {openingMoves}</h2>
+      <h2>{dataChoice === 'winrate' ? 'Winrate' : (dataChoice === 'popularity' ? 'Popularity' : 'Proportion')} of {openingMoves}</h2>
       <h3>{openingName}</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={transformedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -36,10 +44,15 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
           <YAxis domain={['auto', 'auto']} tickFormatter={formatYAxisTick} />
           <Tooltip />
           <Legend payload={[
-            { value: dataChoice === 'winrate' ? 'Winrate' : 'Popularity', type: 'line', id: dataChoice, color: dataChoice === 'winrate' ? '#82ca9d' : '#8884d8' }
+            { value: dataChoice === 'winrate' ? 'Winrate' : (dataChoice === 'popularity' ? 'Popularity' : 'Proportion'), type: 'line', id: dataChoice, color: dataChoice === 'winrate' ? '#82ca9d' : '#8884d8' }
           ]} />
+          console.log(payload)
           {dataChoice === 'popularity' && <Line type="monotone" dataKey="popularity" stroke="#8884d8" activeDot={{ r: 8 }} />}
           {dataChoice === 'winrate' && <Line type="monotone" dataKey="winrate" stroke="#82ca9d" />}
+          {!dataChoice && <Line type = "monotone" dataKey = "popularity" stroke="#8884d8" activeDot={{ r: 8 }} />}
+          {!dataChoice && <Line type = "monotone" dataKey = "proportion" stroke="#8884d8" />}
+          {elo_groups.map(eloGroup => (<Line key={eloGroup} type="monotone" dataKey='avgturns' stroke="#8884d8" activeDot={{ r: 8 }} name={{eloGroup}}/>))}
+
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -48,37 +61,24 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
 
 const QueryResults = () => {
   const location = useLocation();
-  const { data, openingMoves, openingName, dataChoice, graphBy } = location.state || { data: null, openingMoves: '', openingName: '', dataChoice: '', graphBy: 'year' };
+  const {data, openingMoves, openingName, dataChoice, graphBy} = location.state || {
+    data: null,
+    openingMoves: '',
+    openingName: '',
+    dataChoice: '',
+    graphBy: 'year'
+  };
   console.log("Query Results Data:")
   console.log(data, openingMoves)
 
   if (data && data.length > 0) {
-    if ("RISKYPLAYSPERCENT" in data[0]) {
-      console.log("Query 2 Activated");
-      return (
-      <div>
-        <h1>Query Results</h1>
-        <Graph2 data={data} />
-      </div>
-      );
-    }
-    if ("ELOGROUP" in data[0]) {
-      console.log("Query 2 Activated");
-      return (
-      <div>
-        <h1>Query Results</h1>
-        {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>No data available.</p>}
-      </div>
-      );
-    }
-    else {
-      return (
+    return (
         <div>
           <h1>Query Results</h1>
-          <ResultsChart data={data} openingMoves={openingMoves} openingName={openingName} dataChoice={dataChoice} graphBy={graphBy} />
+          <ResultsChart data={data} openingMoves={openingMoves} openingName={openingName} dataChoice={dataChoice}
+                        graphBy={graphBy}/>
         </div>
-      );
-    }
+    );
   }
 };
 

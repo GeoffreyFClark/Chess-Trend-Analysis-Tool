@@ -73,21 +73,21 @@ def convert_datetime(data):
 
 
 # 5 Hard-Coded Complex Trend SQL Queries
-def sql_complex_trend_query_1(moves="d4 d5 c4", min_turns=1, max_turns=201, start_year="2000", end_year="2022", graph_by="year"):
-    return queryhelper.query1(moves, min_turns, max_turns, start_year, end_year, graph_by)
+def sql_complex_trend_query_1(date_min="01-JAN-1942", date_max="12-DEC-2023", elo_min=100, elo_max=3900, turns_min=1, turns_max=201, moves="", graph_by="year", player="", opening_color="", queryNumber=1):
+    return queryhelper.query1(date_min, date_max, elo_min, elo_max, turns_min, turns_max, moves, graph_by, player, opening_color, queryNumber)
 
-def sql_complex_trend_query_2(min_Games=1, start_date="JAN-2018", end_date="DEC-2023", fetch_Rows=130):
-    return queryhelper.query2(min_Games, start_date, end_date, fetch_Rows)
+def sql_complex_trend_query_2(date_min="01-JAN-1942", date_max="12-DEC-2023", elo_min=100, elo_max=3900, turns_min=1, turns_max=201, moves="", graph_by="year", player="", opening_color="", queryNumber=2):
+    return queryhelper.query2(date_min, date_max, elo_min, elo_max, turns_min, turns_max, moves, graph_by, player, opening_color, queryNumber)
 
+def sql_complex_trend_query_3(date_min="01-JAN-1942", date_max="12-DEC-2023", elo_min=100, elo_max=3900, turns_min=1, turns_max=201, moves="", graph_by="year", player="", opening_color="", queryNumber=3):
+    return queryhelper.query3(date_min, date_max, elo_min, elo_max, turns_min, turns_max, moves, graph_by, player, opening_color, queryNumber)
 
-def sql_complex_trend_query_3(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "12-DEC-2023"):
-    return queryhelper.query3(low_white_elo, high_white_elo, low_black_elo, high_black_elo, low_turn, high_turn, start_date, end_date)
+def sql_complex_trend_query_4(date_min="01-JAN-1942", date_max="12-DEC-2023", elo_min=100, elo_max=3900, turns_min=1, turns_max=201, moves="", graph_by="year", player="", opening_color="", queryNumber=4):
+    return queryhelper.query4(date_min, date_max, elo_min, elo_max, turns_min, turns_max, moves, graph_by, player, opening_color, queryNumber)
 
-def sql_complex_trend_query_4(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "12-DEC-2023"):
-    return queryhelper.query4(low_white_elo, high_white_elo, low_black_elo, high_black_elo, low_turn, high_turn, start_date, end_date)
+def sql_complex_trend_query_5(date_min="01-JAN-1942", date_max="12-DEC-2023", elo_min=100, elo_max=3900, turns_min=1, turns_max=201, moves="", graph_by="year", player="", opening_color="", queryNumber=5):
+    return queryhelper.query5(date_min, date_max, elo_min, elo_max, turns_min, turns_max, moves, graph_by, player, opening_color, queryNumber)
 
-def sql_complex_trend_query_5(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "12-DEC-2023"):
-    return queryhelper.query5(low_white_elo, high_white_elo, low_black_elo, high_black_elo, low_turn, high_turn, start_date, end_date)
 
 
 # ------------------------------------ API Endpoints ----------------------------------------------
@@ -124,14 +124,6 @@ def login():
     return jsonify({"message": "Invalid username or password"}), 401
 
 
-@app.route('/api/sql-complex-trend-query-<int:query_id>', methods=['GET'])
-def handle_complex_query(query_id):
-    query_function = globals().get(f'sql_complex_trend_query_{query_id}')
-    if query_function:
-        return execute_query(query_function())
-    return jsonify({'error': 'Invalid query id'}), 404
-
-
 def execute_query(query):
     try:
         with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
@@ -148,18 +140,19 @@ def execute_query(query):
 
 
 
-def test_execute_query():
-    with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM GAMES2 FETCH FIRST 100 ROWS ONLY")
+def execute_hardcoded_query(queryNumber, query):
+    try:
+        with oracledb.connect(user=db.username, password=db.password, dsn=db.connection_string) as connection:
+            cursor = connection.cursor()
+            app.logger.info(f"Executing SQL Query: {query}")
+            cursor.execute(query)
             rows = cursor.fetchall()
             results = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
-
-            results = [convert_datetime(row) for row in results]
-            json_object = json.dumps(results, indent=4)
-            with open("sample.json", "w") as outfile:
-                outfile.write(json_object)
-            return results
+            cursor.close()
+            return jsonify(results), 200
+    except Exception as e:
+        app.logger.error(f"SQL Execution Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 
 @jwt_required()
@@ -178,6 +171,34 @@ def query_openings():
     followup_moves_in_database = "e4 = 2534", "d4 = 1745", "Nf3 = 927"
     
     return jsonify(followup_moves_in_database)
+
+
+@jwt_required
+@app.route('/api/sql-complex-trend-query-<int:query_id>', methods=['POST'])
+def handle_complex_query(query_id):
+    data = request.get_json()
+    app.logger.info(f"Received POST data: {data}")
+    query_function = globals().get(f'sql_complex_trend_query_{query_id}')
+    try:
+        return execute_hardcoded_query(data['queryNumber'], query_function(
+            date_min='JAN-' + str(data['startDate']),
+            date_max='DEC-' + str(data['endDate']),
+            elo_min=int(data['eloRange'][0]),
+            elo_max=int(data['eloRange'][1]),
+            turns_min=int(data['numTurns'][0]),
+            turns_max=int(data['numTurns'][1]),
+            moves=data['openingMoves'],
+            graph_by=str(data['graphBy']),
+            player=data.get('player', ''),
+            opening_color=(data['openingColor'].lower() == 'black'),
+            queryNumber=int(data['queryNumber']),
+        ))
+    except KeyError as e:
+        app.logger.error(f"Key Error in request parameters: {str(e)}")
+        return jsonify({'error': 'Bad Request', 'message': f'Missing parameter: {str(e)}'}), 400
+    except ValueError as e:
+        app.logger.error(f"Value Error in request parameters: {str(e)}")
+        return jsonify({'error': 'Bad Request', 'message': f'Invalid parameter value: {str(e)}'}), 400
 
 
 @jwt_required()
@@ -199,7 +220,6 @@ def query_results():
             player=data.get('player', ''),
             opening_color=(data['openingColor'].lower() == 'black'),
         )
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sql_query)
         return execute_query(sql_query)
     except KeyError as e:
         app.logger.error(f"Key Error in request parameters: {str(e)}")

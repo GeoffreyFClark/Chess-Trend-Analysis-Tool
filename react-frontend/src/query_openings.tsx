@@ -38,7 +38,6 @@ const filterOptions = createFilterOptions({
 });
 
 export default function QueryOpenings() {
-  console.log("in app");
   const [game, setGame] = useState(new Chess());  // Creates new chess.js game instance, providing chess rules/logic to react-chessboard
   const [fen, setFen] = useState(game.fen());  // FEN represents a chessboard position, used to update react-chessboard
   // const [rows, setRows] = useState([]);  // To store and update data for the data grid
@@ -50,29 +49,15 @@ export default function QueryOpenings() {
   const [graphBy, setGraphBy] = useState('year');
   const [openingColor, setOpeningColor] = useState('False');
   const navigate = useNavigate();
-  const [startDate, setStartDate] = useState(1950);
+  const [startDate, setStartDate] = useState(1971);
   const [endDate, setEndDate] = useState(2023);
   const [playerInputValue, setplayerInputValue] = useState('');
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
 
-  
-
-  const handleHardCodedQuery = async (queryNumber) => {
-
-    try {
-      const response = await fetch(`http://localhost:5000/api/sql-complex-trend-query-${queryNumber}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
-      navigate('/query-results', { state: { data } });
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-    }
-  };
 
   const handleAutocompleteChange = (event: any, value: Player) => {
     if (value) console.log("Selected player: ", value.PLAYER);
   };
-
 
   const updateOpeningMoves = (selectedOpening) => {
     game.reset();
@@ -87,14 +72,13 @@ export default function QueryOpenings() {
   };
 
   const hardCodedQueryDescriptions = [
-    { desc: "Specific Opening Prominence", tooltip: "" },
-    { desc: "Risky Openings", tooltip: "" },
-    { desc: "Result Predictions", tooltip: "" },
-    { desc: "Average Number of Turns", tooltip: "" },
-    { desc: "Popular Openings", tooltip: "Popular Openings: Analyze trends in the most popular chess openings over time. Chess openings are identified using Encyclopedia of Chess Openings (ECO) codes, the most common system for categorizing chess openings." }
+    { desc: "Specific Opening Prominence", tooltip: "Analyze trends in the prominence of a single chess opening. This case study query takes user inputs for opening moves, turn range, and date range." },
+    { desc: "Risky Openings", tooltip: "Analyze trends in percentages of risky openings used by players. This product defines risky openings as openings highly likely to result in either a rapid win or a rapid loss. This query takes user inputs for date range." },  // "takes user inputs for minimum games, number of output rows" removed
+    { desc: "Result Predictions", tooltip: "Analyze trends in the predictive power of comparative player Elo ratings. Elo ratings are a method for calculating the relative skill levels of players. It is expected that differences in player Elo ratings can be used to predict outcomes. This query takes user inputs for Elo range, turn range, and date range." },
+    { desc: "Average Number of Turns", tooltip: "Analyze trends in the average number of turns between evenly matched players over time. Evenly matched players are identified using their Elo rating, a method for calculating the relative skill levels of players. This query takes user inputs for Elo range, turn range, and date range." },
+    { desc: "3 Most Popular Openings by Year", tooltip: "Analyze trends in the most popular chess openings over time. This query takes user inputs for Elo range, turn range, and date range." }
   ];
   
-
 
   // Sends the player's move to the server for processing
   const sendMoveToServer = async (sourceSq, targetSq, piece) => {
@@ -149,6 +133,45 @@ export default function QueryOpenings() {
     return true;
   };
 
+  const handleHardCodedQuery = async (queryNumber) => {
+    const recognizedOpeningName = Object.keys(openings).find(key => openings[key] === moveHistory.join(' '));
+    const YaxisLabel= queryNumber === 1 ? 'Proportion of Database':
+                      queryNumber === 2 ? 'Proportion of Database' :
+                      queryNumber === 3 ? 'Observed Probability' :
+                      queryNumber === 4 ? 'Average Turns' :
+                      queryNumber === 5 ? '3 Most Popular Openings by Year' : 
+                      'Data';
+
+    const payload = {
+      startDate,
+      endDate,
+      eloRange,
+      numTurns,
+      openingMoves: moveHistory.join(' '),
+      openingName: recognizedOpeningName || "Opening", // Add the opening name if recognized
+      queryNumber,
+      graphBy,
+      player: playerInputValue,
+      openingColor,
+      YaxisLabel,
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/sql-complex-trend-query-${queryNumber}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      navigate('/query-results', { state: { data, openingMoves: moveHistory.join(' '), openingName: recognizedOpeningName, dataChoice, graphBy, YaxisLabel, queryNumber } });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
 
   const submitSelections = async () => {
@@ -168,9 +191,6 @@ export default function QueryOpenings() {
       openingColor,
       YaxisLabel,
     };
-    console.log("Payload:", payload);
-    console.log("Opening Moves:", moveHistory.join(' '));
-    console.log("Opening Name:", recognizedOpeningName);
   
     try {
       const response = await fetch('http://localhost:5000/api/query-results', {
@@ -183,12 +203,12 @@ export default function QueryOpenings() {
   
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      navigate('/query-results', { state: { data, openingMoves: moveHistory.join(' '), openingName: recognizedOpeningName, dataChoice, YaxisLabel } });
+      navigate('/query-results', { state: { data, openingMoves: moveHistory.join(' '), openingName: recognizedOpeningName, dataChoice, graphBy, YaxisLabel } });
     } catch (error) {
       console.error("Failed to submit query:", error);
     }
   };
-  
+ 
 
   return (
     <div style={{ display: 'flex', alignItems: 'start', gap: '24px' }}>
@@ -269,7 +289,7 @@ export default function QueryOpenings() {
 
 
         <Typography marginTop={'5px'}>
-          Elo Rating Range
+          Elo Rating Range (Elo System calculates the relative skill of players)
         </Typography>
         <Slider 
           value={eloRange}

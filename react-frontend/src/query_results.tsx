@@ -20,6 +20,7 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
 ];
   const compare_data = data;
 
+
   const transformedData = data.map((entry) => ({
     ...entry,
     month: entry.MONTH,
@@ -53,14 +54,13 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
           <Legend payload={[
             { value: dataChoice === 'winrate' ? 'Winrate' : (dataChoice === 'popularity' ? 'Popularity' : 'Proportion'), type: 'line', id: dataChoice, color: dataChoice === 'winrate' ? '#82ca9d' : '#8884d8' }
           ]} />
-
           {dataChoice === 'popularity' && <Line type="monotone" dataKey="popularity" stroke="#8884d8" activeDot={{ r: 8 }} />}
           {dataChoice === 'winrate' && <Line type="monotone" dataKey="winrate" stroke="#82ca9d" />}
           {!dataChoice && <Line type = "monotone" dataKey = "popularity" stroke="#8884d8" activeDot={{ r: 8 }} />}
           {!dataChoice && <Line type = "monotone" dataKey = "proportion" stroke="#8884d8" />}
+
           {elo_groups.map((eloGroup, index) => (<Line key={index} type="monotone" dataKey='avgturns' data={transformedData.filter(entry => entry.elogroup === eloGroup)} stroke={elo_colors[index % elo_colors.length]} activeDot={{ r: 8 }} name={eloGroup}/>))}
           {eco_codes.map((ecoCode, index) => (<Line key={index} type="monotone" dataKey='rank' data={transformedData.filter(entry => entry.ecocode === ecoCode)} stroke={uniqueColors[index % uniqueColors.length]} name={ecoCode}/>))}
-
 
         </LineChart>
       </ResponsiveContainer>

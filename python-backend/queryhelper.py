@@ -144,11 +144,11 @@ def query4(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black
     return query
 
 def PlayerAndEcoByYear():
-    query = (f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, WHITEPLAYER AS Player, ECOCODE, COUNT(*) AS GameCount "
+    query = (f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, WHITEPLAYER AS Player, ECOCODE, "
              f"FROM UserSelectedGames "
              f"GROUP BY EXTRACT(YEAR FROM EVENTDATE), WHITEPLAYER, ECOCODE) "
              f"UNION ALL "
-             f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, BLACKPLAYER AS Player, ECOCODE, COUNT(*) AS GameCount "
+             f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, BLACKPLAYER AS Player, ECOCODE, "
              f"FROM UserSelectedGames "
              f"GROUP BY EXTRACT(YEAR FROM EVENTDATE), BLACKPLAYER, ECOCODE)")
     return query

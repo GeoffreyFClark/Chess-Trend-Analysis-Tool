@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Graph2 from './Graphs';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label } from 'recharts';
 
 const formatYAxisTick = (tick) => {
   return tick.toFixed(2);
 };
 
-const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) => {
+const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy, YaxisLabel }) => {
 
-  console.log("Query Results Data:")
-  console.log(data, openingMoves)
-  console.log("Data received for chart:", data);
+  console.log("Query Results Data::: ", data)
+  // console.log(data, openingMoves)
+  
 
 
   const transformedData = data.map((entry) => ({
@@ -22,10 +22,12 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
     proportion: parseFloat(entry.PROPORTION),
     winrate: parseFloat(entry.WINRATE),
     avgturns: parseFloat(entry.AVERAGENUMBEROFTURNS),
-    elogroup: entry.ELOGROUP
-}));
+    elogroup: entry.ELOGROUP,
+    YaxisLabel: entry.YaxisLabel
+  }));
   const elo_groups = [...new Set(transformedData.map(entry => entry.ELOGROUP))];
   // Decide on the key for the XAxis based on graphBy
+  
 
   return (
     <div>
@@ -41,7 +43,15 @@ const ResultsChart = ({ data, openingMoves, openingName, dataChoice, graphBy }) 
             ].map(row => ({ ...row, ts: moment(row.date, "YYYYMMDD").valueOf() }));
             tickFormatter={(unixTimestamp) => moment(unixTimestamp).format("YYYY-MM")}
             */}
-          <YAxis domain={['auto', 'auto']} tickFormatter={formatYAxisTick} />
+          <YAxis tickFormatter={formatYAxisTick}>
+            <Label
+              value={YaxisLabel ? YaxisLabel : dataChoice === 'winrate' ? 'Winrate %' : (dataChoice === 'popularity' ? 'Popularity %' : 'Data')}
+              angle={-90}
+              position="insideLeft"
+              offset={-5}
+              style={{ textAnchor: 'middle' }}
+            />
+          </YAxis>
           <Tooltip />
           <Legend payload={[
             { value: dataChoice === 'winrate' ? 'Winrate' : (dataChoice === 'popularity' ? 'Popularity' : 'Proportion'), type: 'line', id: dataChoice, color: dataChoice === 'winrate' ? '#82ca9d' : '#8884d8' }

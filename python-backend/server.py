@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 import datetime
 import queryhelper
 from sql_gen_query import create_sql_query
-
+from flask_sqlalchemy import SQLAlchemy  
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
@@ -18,6 +20,32 @@ CORS(app) # This is fine for development, but for production we need to restrict
 
 # config database instance
 db = OracleConfig()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///CommuniCare_Users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+user_db = SQLAlchemy(app)
+
+
+
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')  
+jwt = JWTManager(app)
+
+# -------------------------------- Models --------------------------------------
+
+class User(user_db.Model):
+    id = user_db.Column(user_db.Integer, primary_key=True)
+    username = user_db.Column(user_db.String(25), unique=True, nullable=False)
+    email = user_db.Column(user_db.String(100), unique=True, nullable=False)
+    password_hash = user_db.Column(user_db.String(128))
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def get_resource_ids(self):
+        return [resource.id for resource in self.resources]
 
 
 # initializes the session with the database
@@ -61,6 +89,40 @@ def sql_complex_trend_query_5(low_white_elo=246, high_white_elo=3958, low_black_
     return queryhelper.query5(low_white_elo, high_white_elo, low_black_elo, high_black_elo, low_turn, high_turn, start_date, end_date)
 
 
+# ------------------------------------ API Endpoints ----------------------------------------------
+
+# Register endpoint
+@app.route('/api/register', methods=['POST'])
+def register():
+    username = request.json.get('username')
+    email = request.json.get('email')
+    password = request.json.get('password')
+
+    if User.query.filter_by(username=username).first() is not None:
+        return jsonify({"message": "Username already exists"}), 400
+
+    user = User(username=username, email=email)
+    user.set_password(password)
+    user_db.session.add(user)
+    user_db.session.commit()
+
+    return jsonify({"message": "User created successfully"}), 201
+
+
+# Login endpoint
+@app.route('/api/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    user = User.query.filter_by(username=username).first()
+
+    if user and user.check_password(password):
+        access_token = create_access_token(identity=username)
+        return jsonify(access_token=access_token)
+
+    return jsonify({"message": "Invalid username or password"}), 401
+
+
 @app.route('/api/sql-complex-trend-query-<int:query_id>', methods=['GET'])
 def handle_complex_query(query_id):
     query_function = globals().get(f'sql_complex_trend_query_{query_id}')
@@ -99,6 +161,7 @@ def test_execute_query():
             return results
 
 
+@jwt_required()
 @app.route('/api/query-openings', methods=['POST'])
 def query_openings():
     data = request.json
@@ -116,6 +179,7 @@ def query_openings():
     return jsonify(followup_moves_in_database)
 
 
+@jwt_required()
 @app.route('/api/query-results', methods=['POST'])
 def query_results():
     data = request.get_json()
@@ -132,7 +196,7 @@ def query_results():
             data_metric=data['dataChoice'],
             graph_by=str(data['graphBy']),
             player=data.get('player', ''),
-            opening_color=(data['openingColor'].lower() == 'black')
+            opening_color=(data['openingColor'].lower() == 'black'),
         )
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sql_query)
         return execute_query(sql_query)

@@ -130,14 +130,14 @@ def query3(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black
 
 def EvenlyMatchedGames():
     query = (f"SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, WHITEELO, BLACKELO, TURNS FROM UserSelectedGames "
-             f"WHERE WHITEELO - BLACKELO <= 50 AND WHITEELO - BLACKELO <= 50")
+             f"WHERE ABS(WHITEELO - BLACKELO) <= 50")
     return query
 
 def EachYearsEloStatistics():
-    query = (f"SELECT year, AVG((WHITEELO + BLACKELO) / 2) As AveragePairElo, "
+    query = (f"SELECT Year, AVG((WHITEELO + BLACKELO) / 2) As AveragePairElo, "
              f"STDDEV((WHITEELO + BLACKELO) / 2) As StdDevPairElo "
              f"FROM EvenlyMatchedGames "
-             f"GROUP BY YEAR")
+             f"GROUP BY Year")
     return query
 
 def query4(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "01-JAN-2024"):
@@ -145,34 +145,33 @@ def query4(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black
              f"EvenlyMatchedGames AS ({EvenlyMatchedGames()}), "
              f"EachYearsEloStatistics AS ({EachYearsEloStatistics()}) "
              f"SELECT t1.Year, CASE WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) < (t2.AveragePairElo - t2.StdDevPairElo) THEN 'BelowStdDevPair' "
-             f"WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) > (t2.AveragePairElo - t2.StdDevPairElo) THEN 'AboveStdDevPair' "
+             f"WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) > (t2.AveragePairElo + t2.StdDevPairElo) THEN 'AboveStdDevPair' "
              f"ELSE 'WithinStdDevPair' "
              f"END AS EloGroup, "
              f"AVG(t1.TURNS) AS AverageNumberOfTurns "
              f"FROM EvenlyMatchedGames t1 JOIN EachYearsEloStatistics t2 ON t1.Year = t2.Year "
              f"GROUP BY t1.Year, "
              f"CASE WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) < (t2.AveragePairElo - t2.StdDevPairElo) THEN 'BelowStdDevPair' "
-             f"WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) > (t2.AveragePairElo - t2.StdDevPairElo) THEN 'AboveStdDevPair' "
+             f"WHEN ((t1.WHITEELO + t1.BLACKELO) / 2) > (t2.AveragePairElo + t2.StdDevPairElo) THEN 'AboveStdDevPair' "
              f"ELSE 'WithinStdDevPair' "
              f"END "
-             f"ORDER BY t1.Year")
+             f"ORDER BY t1.Year ASC")
     return query
 
 def PlayerAndEcoByYear():
     query = (f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, WHITEPLAYER AS Player, ECOCODE "
-             f"FROM UserSelectedGames "
-             f"GROUP BY EXTRACT(YEAR FROM EVENTDATE), WHITEPLAYER, ECOCODE) "
-             f"UNION "
+             f"FROM UserSelectedGames) "
+             f"UNION ALL "
              f"(SELECT EXTRACT(YEAR FROM EVENTDATE) AS Year, BLACKPLAYER AS Player, ECOCODE "
-             f"FROM UserSelectedGames "
-             f"GROUP BY EXTRACT(YEAR FROM EVENTDATE), BLACKPLAYER, ECOCODE)")
+             f"FROM UserSelectedGames)")
     return query
 
 def EcoRankByYear():
     query = (f"SELECT Year, ECOCODE, RANK() OVER (PARTITION BY Year ORDER BY COUNT(*) DESC) AS Rank FROM PlayerAndECOByYear GROUP BY Year, ECOCODE")
     return query
 
-def query5(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "01-JAN-2024"):
+
+def query5(low_white_elo=246, high_white_elo=3958, low_black_elo=246, high_black_elo=3958, low_turn=1, high_turn=201, start_date="01-JAN-1942", end_date = "12-DEC-2023"):
     query = (f"WITH UserSelectedGames AS ({UserSelectedGames(low_white_elo=low_white_elo, high_white_elo=high_white_elo, low_black_elo=low_black_elo, high_black_elo=high_black_elo, low_turn=low_turn, high_turn=high_turn, start_date=start_date, end_date=end_date)}), "
              f"PlayerAndEcoByYear AS ({PlayerAndEcoByYear()}), "
              f"ECORankByYear AS ({EcoRankByYear()}) "

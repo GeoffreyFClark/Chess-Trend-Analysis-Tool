@@ -21,7 +21,7 @@ CORS(app) # This is fine for development, but for production we need to restrict
 # config database instance
 db = OracleConfig()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///CommuniCare_Users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ChessDB_Users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 user_db = SQLAlchemy(app)
 

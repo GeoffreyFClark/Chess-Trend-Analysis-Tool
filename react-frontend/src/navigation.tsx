@@ -39,7 +39,7 @@ function Navigation() {
     <AppBar position="static">
       <Toolbar style={{ minHeight: '56px' }}>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Chess Opening Database Project
+          Chess Trends Analyzer
         </Typography>
         {username ? (
           <Box sx={{ position: 'relative', display: 'inline-block' }}>

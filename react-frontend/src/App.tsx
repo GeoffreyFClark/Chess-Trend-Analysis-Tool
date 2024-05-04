@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react'
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import QueryOpenings from './query_openings';
 import QueryResults from './query_results';
 import TestQuery from './test-query';
 import Navigation from './navigation';
-import Home from './home';
 import Login from './Login';
 import Register from './Register';
 
